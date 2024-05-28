@@ -1,0 +1,297 @@
+
+body { font-family: Arial, sans-serif; }
+.container { margin: 15px; }
+table { width: 100%; border-collapse: collapse; }
+table, th, td { border: 1px solid black; }
+th, td { padding: 8px; text-align: left; }
+#initial-view{
+    width: 640px;
+    padding: 30px;
+    text-align: center;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #f9f9f9;
+    border: 2px solid #d3c3c3;
+    border-radius: 20px;
+    
+}
+
+#result-view { 
+    background-color: white;
+    width: 800px;
+    display: none; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid black; padding: 8px; text-align: left; }
+
+
+/* style for main heading in the initial view */
+#header{
+  display: flex;
+  justify-content:flex-start;
+  /* margin-left: 50px; */
+}
+
+#icon{
+  /* margin-right: 10px; */
+  height: 30px;
+  width: 30px;
+  padding-top: 21px;
+}
+
+h2 {
+    /* border: solid 1px rgb(24, 112, 167); */
+    padding-left: 52px;
+    color: black;
+    font-size: 25px;
+    margin-left: -44px;
+    margin-right: -47px;
+  }
+  
+  label {
+    font-size: 15px; /* This will set the font size of label elements to 1.2 times the font size of their parent element */
+  }
+
+
+  /* for downloads */
+  #idownload{
+    display: flex;
+    justify-content: space-between;
+    /* align-content: space-evenly; */
+  }
+
+  #check-list{
+    display: flex;
+    justify-content: space-between;
+  } 
+
+
+
+  /* Styles for done button */
+  
+  #doneButton,#previewButton{
+    background-color: #1a73e8;;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 20px; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+  }
+  
+  #compare-button {
+    background-color:#1a73e8;;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 20px; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    
+
+  }
+  #compare-button:hover {
+    background-color: #0f5ec4; 
+  }
+
+
+  #doneButton:hover {
+    background-color: #0f5ec4; 
+  }
+  #previewButton:hover {
+    background-color: #0f5ec4; 
+  }
+
+  /* #done-button {
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  } */
+
+
+
+  #all-links-container, #broken-links-container {
+    border: 1px solid black;
+    width: 650px;
+    margin-left: 60px;
+    padding: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  #all-links-container {
+    border: 1px solid rgb(0, 96, 193);
+    margin-top: 25px;
+    height: 180px;
+    margin-bottom: 20px;
+    background-color: beige;
+  }
+  #links-list{
+    background-color: #f9f9f9;
+  }
+
+
+#all-links{
+    color: black;
+    font-size: 12px;
+    text-align: center;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+  #broken-links-container{
+    border: 1px solid rgb(0, 96, 193);
+    background-color: beige;
+    text-align: center;
+    height: 180px;
+  }
+
+  #broken-links{
+    color: black;
+    font-size: 12px;
+  }
+
+  #broken-links-list{
+    background-color: #f9f9f9;
+  }
+
+  
+
+  #back {
+    background-color: rgb(147, 99, 224);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 20px; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+  }
+  
+  #back:hover {
+    background-color: violet;
+  }
+
+
+
+  #downloadPdfButton {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 20px; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+  }
+
+  #downloadExcelButton{
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 20px; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    
+  }
+
+  #downloadExcelButton:hover{
+    background-color:rgb(1, 79, 1);
+  }
+  
+  #downloadPdfButton:hover {
+    background-color: rgb(1, 79, 1); 
+  }
+
+
+  #enable-check{
+    transform: scale(1.5);
+    border: #007bff;
+  }
+
+
+  /* for the checkbox and links */
+
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.checkbox-container i {
+    margin-right: 8px;
+}
+ 
+
+/* for download icons */
+
+#downloadPdfButton i.fa-file-pdf {
+  color: red;
+  /* font-size: 24px; Adjust size as needed */
+}
+
+#preview-button{
+  margin-left: 37px;
+}
+
+#compare-button{
+  margin-left: 140px;
+}
+
+#buttonClass{
+  display: flex;
+  justify-content: space-between;
+}
+
+Move the Generate button and Preview button to the left side */
+#doneButton,#previewButton {
+  margin-right: 350px;
+  margin-top: 30px; /* Add margin to separate buttons
+}
+
+/* Move the two download buttons to the right side */
+#buttonClass {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+}
+
+/* Adjust individual button styles */
+/* #downloadPdfButton,
+#downloadExcelButton {
+  margin-left: 2%; /* Add margin between buttons */
+} 
+#previewButton{
+  margin-left: -6px;
+} 
+
+#compare-button{
+  margin-left: 2px;
+}
+
+.checkbox-container label{
+  color:black ;
+  font-weight: bold;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+} 
+
+#countdown{
+  color:black ;
+  font-weight: bold;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.highlighted-link {
+  background-color: yellow;
+}

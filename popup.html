@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Link Checker</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap"
+      rel="stylesheet"
+    />
+</head>
+<body>
+  <div id="header">
+    <img id="icon" src="./icon.png" alt="image of url" />
+    <h2>URL Analyzer</h2>
+ </div>
+  <div id="initial-view">
+    <div id="check-list">
+      <div>
+        <div>
+          <div class="checkbox-container">
+            <i class="fas fa-link"></i>
+            <input type="checkbox" id="checkAllLinks" />
+            
+            <label for="enable-check-1">Check all links</label>
+            
+          </div>
+          <div class="checkbox-container">
+            <i class="fas fa-link"></i>
+            <input type="checkbox" id="checkBrokenLinks" />
+            
+            <label for="enable-check-2">Check broken links</label>
+            
+          </div>
+          <div class="checkbox-container">
+            <i class="fas fa-link"></i>
+            <input type="checkbox" id="checkLocalLanguageLinks" />
+            
+            <label for="enable-check-3">Check local language links</label>
+            
+          </div>
+          <div class="checkbox-container">
+            <i class="fas fa-link"></i>
+            <input type="checkbox" id="checkAllDetails" />
+            
+            <label for="enable-check-4">Check all details</label>
+           
+          </div>
+        </div>
+      </div>
+    
+          <div id="text-area">
+            <textarea
+              name=""
+              id=""
+              placeholder="You can paste your URL here"
+            ></textarea>
+            <br />
+            <br />
+            <button id="compare-button">Compare</button>
+          </div>
+        </div>
+        
+        <div>
+    <form id="optionsForm">
+
+      
+      <div id="buttonClass">
+        <button type="button" id="doneButton">Generate</button>
+      <button type="button" id="previewButton">Preview</button>
+      <button type="button" id="downloadPdfButton"><i class="fa-solid fa-file-pdf"></i>Download as PDF</button>
+      <button type="button" id="downloadExcelButton"><i class="fa-solid fa-file-excel"></i> Download as Excel</button>
+      </div><br>
+      <div id="countdown"></div></div>
+    </form>
+      </div>
+      </div>
+      
+    </div>
+   
+    
+  </div>
+  <div id="comparisonResults"></div>
+
+    <div id="result" style="display:none;">
+      <h2>Results</h2>
+      <div id="allLinksTable">
+        <!-- <table>
+            <tr>
+              <th>Link</th>
+              <th>Status</th>
+            </tr>
+          </table> -->
+      </div>
+
+      <div id="brokenLinksTable">
+        <!-- <table>
+            <tr>
+              <th>Link</th>
+              <th>Status</th>
+            </tr>
+          </table> -->
+      </div>
+      <div id="localLanguageLinksTable">
+        <!-- <table>
+            <tr>
+              <th>Link</th>
+              <th>Status</th>
+            </tr>
+          </table> -->
+      </div>
+    </div>
+  <script src="popup.js"></script>
+  <!-- <script src="./compare.js"></script> -->
+  <script src="libs/jspdf.umd.min.js"></script>
+  <script src="libs/jspdf.plugin.autotable.min.js"></script>
+  <script src="libs/xlsx.full.min.js"></script>
+</body>
+</html>

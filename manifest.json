@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "Link Status Checker",
+    "version": "1.0",
+    "description": "Check all links on a webpage for their status codes and other details.",
+    "permissions": ["activeTab", "scripting","tabs"],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "icon.png"
+    },
+    "host_permissions": ["<all_urls>"]
+}
+  
+  
