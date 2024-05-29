@@ -55,7 +55,6 @@ const countdownInterval = setInterval(() => {
       alert('No result returned from the link check.');
     }
   } catch (error) {
-    //console.error('Error checking links:', error); // Debugging
     clearInterval(countdownInterval);
     countdownElement.textContent='';
     console.error(error);
@@ -170,17 +169,6 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
 
   XLSX.writeFile(wb, 'links_report.xlsx');
 });
-// function displayAllLinks(links) {
-//   let html = '<table><tr><th>All Links</th><th>Status</th></tr>';
-//   links.forEach(link => {
-//     const statusColor = link.status === 200 ? 'green' : 'red';
-//     //for aka.ms
-//     const highlightedUrl = link.url.includes('aka.ms') ? `<span class="highlighted-link">${link.url}</span>` : link.url;
-//     html += `<tr><td>${link.url}</td><td style="color: ${statusColor};">${link.status}</td></tr>`;
-//   });
-//   html += '</table>';
-//   document.getElementById('allLinksTable').innerHTML = html;
-// }
 
 function displayAllLinks(links) {
   let html = '<table><tr><th>All Links</th><th>Status</th></tr>';
@@ -203,32 +191,6 @@ function displayBrokenLinks(links) {
   html += '</table>';
   document.getElementById('brokenLinksTable').innerHTML = html;
 }
-
-// function displayBrokenLinks(links) {
-//   if (links.length === 0) {
-//     document.getElementById('brokenLinksTable').innerHTML = '<p>No Broken inks found.</p>';
-//     return;
-//   }
-
-//   let html = '<table><tr><th>Broken Links</th><th>Status</th></tr>';
-//   links.forEach(link => {
-//     const statusColor = link.status === 200 ? 'green' : 'red';
-//     html += `<tr><td>${highlightPercent20(link.url)}</td><td style="color: ${statusColor};">${link.status}</td></tr>`;
-//   });
-//   html += '</table>';
-//   document.getElementById('brokenLinksTable').innerHTML = html;
-// }
-
-
-
-// function displayLocalLanguageLinks(links) {
-//   let html = '<table><tr><th>Links</th><th>Region Specific</th></tr>';
-//   links.forEach(link => {
-//     html += `<tr><td>${link.url}</td><td>${getLocalLanguageString(link.url)}</td></tr>`;
-//   });
-//   html += '</table>';
-//   document.getElementById('localLanguageLinksTable').innerHTML = html;
-// }
 
 function displayLocalLanguageLinks(links) {
   let html = '<table><thead><tr><th>Links</th><th>Region Specific</th><th>Link Text</th></tr></thead><tbody>';
@@ -261,40 +223,6 @@ function getLocalLanguageString(url) {
 function highlightPercent20(url) {
   return url.replace(/%20/g, '<span style="color: red;">%20</span>');
 }
-
-// async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails) {
-//   const allLinks = [];
-//   const brokenLinks = [];
-//   const localLanguageLinks = [];
-//   const localLanguageList = [
-//     'en-us', 'en-au', 'en-ca', 'en-gb', 'en-hk', 'en-ie', 'en-in', 'en-my', 'en-nz', 'en-ph', 'en-sg', 'en-za', 'es-es',
-//     'es-mx', 'fr-be', 'fr-ca', 'fr-fr', 'it-it', 'ko-kr', 'pt-br', 'de-de', 'ar-sa', 'da-dk', 'fi-fi', 'ja-jp', 'nb-no',
-//     'nl-be', 'nl-nl', 'zh-cn'
-//   ];
-
-//   const links = Array.from(document.querySelectorAll('a')).map(link => link.href);
-
-//   for (const url of links) {
-//     try {
-//       const response = await fetch(url);
-//       const status = response.status;
-
-//       if (checkAllLinks || checkAllDetails) allLinks.push({ url, status });
-
-//       if ((checkBrokenLinks || checkAllDetails) && (status === 400 || status === 404 || status === 410 || status === 502 || status === 408 || status === 503 || url.includes('%20'))) {
-//         brokenLinks.push({ url, status });
-//       }
-
-//       if ((checkLocalLanguageLinks || checkAllDetails) && localLanguageList.some(language => url.includes(language))) {
-//         localLanguageLinks.push({ url });
-//       }
-//     } catch (error) {
-//       console.log(error)
-//     }
-//   }
-
-//   return { allLinks, brokenLinks, localLanguageLinks };
-// }
 
 async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails) {
   const allLinks = [];
