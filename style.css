@@ -72,23 +72,34 @@ h2 {
     background-color: #1a73e8;;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 5px 10px;
     font-size: 16px;
     cursor: pointer;
     border-radius: 20px; 
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
   }
-  
   #compare-button {
-    background-color:#1a73e8;;
+    background-color:#1a73e8;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 18px;
     font-size: 16px;
     cursor: pointer;
     border-radius: 20px; 
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     
+
+  }
+
+  #clear{
+    background-color:#1a73e8;;
+    color: white;
+    border: none;
+    padding: 5px 19px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 20px; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 
   }
   #compare-button:hover {
@@ -100,6 +111,10 @@ h2 {
     background-color: #0f5ec4; 
   }
   #previewButton:hover {
+    background-color: #0f5ec4; 
+  }
+
+  #clear:hover {
     background-color: #0f5ec4; 
   }
 
@@ -183,12 +198,11 @@ h2 {
   }
 
 
-
   #downloadPdfButton {
-    background-color: green;
+    background-color: #1a73e8;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 18px;
     font-size: 16px;
     cursor: pointer;
     border-radius: 20px; 
@@ -196,10 +210,10 @@ h2 {
   }
 
   #downloadExcelButton{
-    background-color: green;
+    background-color:#1a73e8;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 18px;
     font-size: 16px;
     cursor: pointer;
     border-radius: 20px; 
@@ -208,11 +222,11 @@ h2 {
   }
 
   #downloadExcelButton:hover{
-    background-color:rgb(1, 79, 1);
+    background-color: #0f5ec4;
   }
   
   #downloadPdfButton:hover {
-    background-color: rgb(1, 79, 1); 
+    background-color: #0f5ec4; 
   }
 
 
@@ -256,7 +270,7 @@ h2 {
 
 Move the Generate button and Preview button to the left side */
 #doneButton,#previewButton {
-  margin-right: 350px;
+  margin-right: 370px;
   margin-top: 30px; /* Add margin to separate buttons
 }
 
@@ -272,7 +286,7 @@ Move the Generate button and Preview button to the left side */
   margin-left: 2%; /* Add margin between buttons */
 } 
 #previewButton{
-  margin-left: -6px;
+  margin-left: -px;
 } 
 
 #compare-button{
@@ -295,3 +309,4 @@ Move the Generate button and Preview button to the left side */
 .highlighted-link {
   background-color: yellow;
 }
+
