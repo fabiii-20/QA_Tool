@@ -174,23 +174,36 @@ document.getElementById('compare-button').addEventListener('click', comparePages
 document.getElementById('downloadExcelButton').addEventListener('click', downloadExcel);
 
 async function comparePages() {
-    const targetUrl = document.getElementById('compare-url').value;
-    if (!targetUrl) {
-        alert('Please enter a URL to compare.');
-        return;
-    }
+  const targetUrl = document.getElementById('compare-url').value;
+  if (!targetUrl) {
+      alert('Please enter a URL to compare.');
+      return;
+  }
 
-    // Fetch current page content
-    const currentPageContent = extractPageContent(document);
+  // Fetch current page content
+  const currentTab = await getCurrentTab();
+  const currentUrl = currentTab.url;
+  const currentResponse = await fetch(currentUrl);
+  const currentPageHTML = await currentResponse.text();
+  const currentDoc = new DOMParser().parseFromString(currentPageHTML, 'text/html');
+  const currentPageContent = extractPageContent(currentDoc);
 
-    // Fetch target page content
-    const response = await fetch(targetUrl);
-    const targetPageHTML = await response.text();
-    const targetDoc = new DOMParser().parseFromString(targetPageHTML, 'text/html');
-    const targetPageContent = extractPageContent(targetDoc);
+  // Fetch target page content
+  const targetResponse = await fetch(targetUrl);
+  const targetPageHTML = await targetResponse.text();
+  const targetDoc = new DOMParser().parseFromString(targetPageHTML, 'text/html');
+  const targetPageContent = extractPageContent(targetDoc);
 
-    // Compare and display differences
-    displayDifferences(currentPageContent, targetPageContent);
+  // Compare and display differences
+  displayDifferences(currentPageContent, targetPageContent);
+}
+
+async function getCurrentTab() {
+  return new Promise(resolve => {
+      chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+          resolve(tabs[0]);
+      });
+  });
 }
 
 function extractPageContent(doc) {
@@ -206,6 +219,7 @@ function extractPageContent(doc) {
 
     doc.querySelectorAll('[aria-label]').forEach(el => {
         content.ariaLinks.push({
+            link : el.getAttribute('href'),
             label: el.getAttribute('aria-label'),
             target: el.getAttribute('target')
         });
@@ -227,24 +241,59 @@ function displayDifferences(current, target) {
     displayTable('images-comparison', current.images, target.images);
 }
 
-function displayTable(tableId, currentData, targetData) {
-    const tbody = document.getElementById(tableId).querySelector('tbody');
-    tbody.innerHTML = '';
+// function displayTable(tableId, currentData, targetData) {
+//     const tbody = document.getElementById(tableId).querySelector('tbody');
+//     tbody.innerHTML = '';
 
-    const maxLength = Math.max(currentData.length, targetData.length);
-    for (let i = 0; i < maxLength; i++) {
-        const row = document.createElement('tr');
-        const currentCell = document.createElement('td');
-        const targetCell = document.createElement('td');
+//     const maxLength = Math.max(currentData.length, targetData.length);
+//     for (let i = 0; i < maxLength; i++) {
+//         const row = document.createElement('tr');
+//         const currentCell = document.createElement('td');
+//         const targetCell = document.createElement('td');
 
-        currentCell.innerText = currentData[i] ? JSON.stringify(currentData[i]) : '';
-        targetCell.innerText = targetData[i] ? JSON.stringify(targetData[i]) : '';
+//         currentCell.innerText = currentData[i] ? JSON.stringify(currentData[i]) : '';
+//         targetCell.innerText = targetData[i] ? JSON.stringify(targetData[i]) : '';
 
-        row.appendChild(currentCell);
-        row.appendChild(targetCell);
-        tbody.appendChild(row);
-    }
+//         row.appendChild(currentCell);
+//         row.appendChild(targetCell);
+//         tbody.appendChild(row);
+//     }
+// }
+
+function displayDifferences(current, target) {
+  displayTable('text-comparison', current.textFields, target.textFields);
+  displayTable('aria-comparison', current.ariaLinks, target.ariaLinks);
+  displayTable('images-comparison', current.images, target.images);
 }
+
+function displayTable(tableId, currentData, targetData) {
+  const tbody = document.getElementById(tableId).querySelector('tbody');
+  tbody.innerHTML = '';
+
+  const maxLength = Math.max(currentData.length, targetData.length);
+  for (let i = 0; i < maxLength; i++) {
+      const row = document.createElement('tr');
+      const currentCell = document.createElement('td');
+      const targetCell = document.createElement('td');
+
+      const currentContent = currentData[i] ? JSON.stringify(currentData[i]) : '';
+      const targetContent = targetData[i] ? JSON.stringify(targetData[i]) : '';
+
+      currentCell.innerText = currentContent;
+      targetCell.innerText = targetContent;
+
+      if (currentContent !== targetContent) {
+          // Highlight the cells where the content is different
+          currentCell.style.backgroundColor = 'lightcoral';
+          targetCell.style.backgroundColor = 'lightcoral';
+      }
+
+      row.appendChild(currentCell);
+      row.appendChild(targetCell);
+      tbody.appendChild(row);
+  }
+}
+
 
 function downloadExcel() {
     const wb = XLSX.utils.book_new();
@@ -285,7 +334,11 @@ function downloadExcel() {
     XLSX.writeFile(wb, 'comparison_report.xlsx');
 }
 
-
+//clear Button
+document.getElementById('clear').addEventListener('click', () => {
+  localStorage.removeItem('linkResults');
+  document.getElementById('result').style.display = 'none'; // Hide the result section after clearing
+});
 
 function displayAllLinks(links) {
   let html = '<table><tr><th>All Links</th><th>Status</th></tr>';

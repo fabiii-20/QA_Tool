@@ -11,6 +11,7 @@ function extractPageContent() {
 
     document.querySelectorAll('[aria-label]').forEach(el => {
         content.ariaLinks.push({
+            link : el.getAttribute('href'),
             label: el.getAttribute('aria-label'),
             target: el.getAttribute('target')
         });
