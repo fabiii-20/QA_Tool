@@ -3,7 +3,6 @@
 //   localStorage.removeItem('linkResults');
 // };
 
-
 document.getElementById('doneButton').addEventListener('click', async () => {
   const checkAllLinks = document.getElementById('checkAllLinks').checked;
   const checkBrokenLinks = document.getElementById('checkBrokenLinks').checked;
@@ -169,6 +168,124 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
 
   XLSX.writeFile(wb, 'links_report.xlsx');
 });
+
+//compare functionalities
+document.getElementById('compare-button').addEventListener('click', comparePages);
+document.getElementById('downloadExcelButton').addEventListener('click', downloadExcel);
+
+async function comparePages() {
+    const targetUrl = document.getElementById('compare-url').value;
+    if (!targetUrl) {
+        alert('Please enter a URL to compare.');
+        return;
+    }
+
+    // Fetch current page content
+    const currentPageContent = extractPageContent(document);
+
+    // Fetch target page content
+    const response = await fetch(targetUrl);
+    const targetPageHTML = await response.text();
+    const targetDoc = new DOMParser().parseFromString(targetPageHTML, 'text/html');
+    const targetPageContent = extractPageContent(targetDoc);
+
+    // Compare and display differences
+    displayDifferences(currentPageContent, targetPageContent);
+}
+
+function extractPageContent(doc) {
+    const content = {
+        textFields: [],
+        ariaLinks: [],
+        images: []
+    };
+
+    doc.querySelectorAll('h1, h2, p, a').forEach(el => {
+        content.textFields.push(el.innerText);
+    });
+
+    doc.querySelectorAll('[aria-label]').forEach(el => {
+        content.ariaLinks.push({
+            label: el.getAttribute('aria-label'),
+            target: el.getAttribute('target')
+        });
+    });
+
+    doc.querySelectorAll('img').forEach(img => {
+        content.images.push({
+            src: img.getAttribute('src'),
+            alt: img.getAttribute('alt')
+        });
+    });
+
+    return content;
+}
+
+function displayDifferences(current, target) {
+    displayTable('text-comparison', current.textFields, target.textFields);
+    displayTable('aria-comparison', current.ariaLinks, target.ariaLinks);
+    displayTable('images-comparison', current.images, target.images);
+}
+
+function displayTable(tableId, currentData, targetData) {
+    const tbody = document.getElementById(tableId).querySelector('tbody');
+    tbody.innerHTML = '';
+
+    const maxLength = Math.max(currentData.length, targetData.length);
+    for (let i = 0; i < maxLength; i++) {
+        const row = document.createElement('tr');
+        const currentCell = document.createElement('td');
+        const targetCell = document.createElement('td');
+
+        currentCell.innerText = currentData[i] ? JSON.stringify(currentData[i]) : '';
+        targetCell.innerText = targetData[i] ? JSON.stringify(targetData[i]) : '';
+
+        row.appendChild(currentCell);
+        row.appendChild(targetCell);
+        tbody.appendChild(row);
+    }
+}
+
+function downloadExcel() {
+    const wb = XLSX.utils.book_new();
+    wb.Props = {
+        Title: "Comparison Report",
+        Subject: "Page Comparison",
+        Author: "Your Name",
+        CreatedDate: new Date()
+    };
+
+    // Convert text fields comparison to worksheet
+    const textComparisonData = [["Current Page", "Target Page"]].concat(
+        Array.from(document.querySelectorAll('#text-comparison tbody tr')).map(row => {
+            return Array.from(row.cells).map(cell => cell.textContent);
+        })
+    );
+    const textComparisonSheet = XLSX.utils.aoa_to_sheet(textComparisonData);
+    XLSX.utils.book_append_sheet(wb, textComparisonSheet, "Text Fields Comparison");
+
+    // Convert aria-label links comparison to worksheet
+    const ariaComparisonData = [["Current Page", "Target Page"]].concat(
+        Array.from(document.querySelectorAll('#aria-comparison tbody tr')).map(row => {
+            return Array.from(row.cells).map(cell => cell.textContent);
+        })
+    );
+    const ariaComparisonSheet = XLSX.utils.aoa_to_sheet(ariaComparisonData);
+    XLSX.utils.book_append_sheet(wb, ariaComparisonSheet, "ARIA-label Links Comparison");
+
+    // Convert images comparison to worksheet
+    const imagesComparisonData = [["Current Page", "Target Page"]].concat(
+        Array.from(document.querySelectorAll('#images-comparison tbody tr')).map(row => {
+            return Array.from(row.cells).map(cell => cell.textContent);
+        })
+    );
+    const imagesComparisonSheet = XLSX.utils.aoa_to_sheet(imagesComparisonData);
+    XLSX.utils.book_append_sheet(wb, imagesComparisonSheet, "Images Comparison");
+
+    XLSX.writeFile(wb, 'comparison_report.xlsx');
+}
+
+
 
 function displayAllLinks(links) {
   let html = '<table><tr><th>All Links</th><th>Status</th></tr>';
