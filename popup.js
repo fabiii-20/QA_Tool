@@ -1,16 +1,11 @@
-// Function to clear stored link results when the page loads
-// window.onload = function() {
-//   localStorage.removeItem('linkResults');
-// };
-
 document.getElementById('doneButton').addEventListener('click', async () => {
   const checkAllLinks = document.getElementById('checkAllLinks').checked;
   const checkBrokenLinks = document.getElementById('checkBrokenLinks').checked;
   const checkLocalLanguageLinks = document.getElementById('checkLocalLanguageLinks').checked;
   const checkAllDetails = document.getElementById('checkAllDetails').checked;
+  const checkHeading = document.getElementById('checkHeading').checked;
 
-
-  if (!checkAllLinks && !checkBrokenLinks && !checkLocalLanguageLinks && !checkAllDetails) {
+  if (!checkAllLinks && !checkBrokenLinks && !checkLocalLanguageLinks && !checkAllDetails && !checkHeading) {
     alert('Please check at least one checkbox.');
     return;
   }
@@ -21,26 +16,26 @@ document.getElementById('doneButton').addEventListener('click', async () => {
     return;
   }
 
-let countdownTime = 300; // Set countdown time in seconds (5 minutes)
-const countdownElement = document.getElementById('countdown');
-countdownElement.style.display = 'block'; // Ensure countdown element is visible
-updateCountdown(countdownElement, countdownTime);
-
-const countdownInterval = setInterval(() => {
-  countdownTime -= 1;
+  let countdownTime = 300; // Set countdown time in seconds (5 minutes)
+  const countdownElement = document.getElementById('countdown');
+  countdownElement.style.display = 'block'; // Ensure countdown element is visible
   updateCountdown(countdownElement, countdownTime);
 
-  if (countdownTime <= 0) {
-    clearInterval(countdownInterval);
-    countdownElement.textContent = 'Time is up!';
-  }
-}, 1000);
+  const countdownInterval = setInterval(() => {
+    countdownTime -= 1;
+    updateCountdown(countdownElement, countdownTime);
+
+    if (countdownTime <= 0) {
+      clearInterval(countdownInterval);
+      countdownElement.textContent = 'Time is up!';
+    }
+  }, 1000);
 
   try {
     const [{ result }] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: checkLinks,
-      args: [checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails]
+      args: [checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading]
     });
 
     console.log('Link check result:', result); // Debugging
@@ -48,14 +43,14 @@ const countdownInterval = setInterval(() => {
     if (result) {
       localStorage.setItem('linkResults', JSON.stringify(result));
       clearInterval(countdownInterval);
-      countdownElement.textContent= 'Loading compeleted now you can download your files'
+      countdownElement.textContent = 'Loading completed. Now you can download your files';
       alert('Completed');
     } else {
       alert('No result returned from the link check.');
     }
   } catch (error) {
     clearInterval(countdownInterval);
-    countdownElement.textContent='';
+    countdownElement.textContent = '';
     console.error(error);
     alert('An error occurred while checking links.');
   }
@@ -74,61 +69,11 @@ document.getElementById('previewButton').addEventListener('click', () => {
     displayAllLinks(results.allLinks);
     displayBrokenLinks(results.brokenLinks);
     displayLocalLanguageLinks(results.localLanguageLinks);
+    displayHeading(results.headingHierarchy);
   } else {
     alert('No data to preview. Please click "Done" first.');
   }
 });
-
-document.getElementById('downloadPdfButton').addEventListener('click', () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  // Function to extract table data
-//   function extractTableData(selector) {
-//     const rows = Array.from(document.querySelectorAll(`${selector} tr`)).slice(1); // Skip the header row
-//     return rows.map(row => {
-//         return Array.from(row.cells).map(cell => cell.textContent.trim()); // Trim whitespace
-//     }).filter(row => row.every(cell => cell !== '')); // Filter out rows with all empty cells
-// }
-
-// Function to extract table data
-function extractTableData(selector) {
-  const rows = Array.from(document.querySelectorAll(`${selector} tr`)).slice(1); // Skip the header row
-  return rows.map(row => {
-    return Array.from(row.cells).map(cell => cell.textContent.trim()); // Trim whitespace
-  }).filter(row => row.some(cell => cell !== '')); // Filter out rows with at least one non-empty cell
-}
-
-
-  // Adding "All Links" table to the PDF
-  doc.text('All Links', 10, 10);
-  doc.autoTable({
-    head: [['URL', 'Status']],
-    body: extractTableData('#allLinksTable'),
-    startY: 20
-  });
-
-  // Adding "Broken Links" table to the PDF
-  let lastY = doc.lastAutoTable.finalY + 10; // Get the Y position after the last table
-  doc.text('Broken Links', 10, lastY);
-  doc.autoTable({
-    head: [['URL', 'Status']],
-    body: extractTableData('#brokenLinksTable'),
-    startY: lastY + 10
-  });
-
-  // Adding "Local Language Links" table to the PDF
-  lastY = doc.lastAutoTable.finalY + 10; // Update the Y position again
-  doc.text('Local Language Links', 10, lastY);
-  doc.autoTable({
-    head: [['URL', 'Language String']],
-    body: extractTableData('#localLanguageLinksTable'),
-    startY: lastY + 10
-  });
-
-  doc.save('links_report.pdf');
-});
-
 
 document.getElementById('downloadExcelButton').addEventListener('click', () => {
   const wb = XLSX.utils.book_new();
@@ -176,8 +121,8 @@ document.getElementById('downloadExcelButton').addEventListener('click', downloa
 async function comparePages() {
   const targetUrl = document.getElementById('compare-url').value;
   if (!targetUrl) {
-      alert('Please enter a URL to compare.');
-      return;
+    alert('Please enter a URL to compare.');
+    return;
   }
 
   // Fetch current page content
@@ -200,65 +145,40 @@ async function comparePages() {
 
 async function getCurrentTab() {
   return new Promise(resolve => {
-      chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-          resolve(tabs[0]);
-      });
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+      resolve(tabs[0]);
+    });
   });
 }
 
 function extractPageContent(doc) {
-    const content = {
-        textFields: [],
-        ariaLinks: [],
-        images: []
-    };
+  const content = {
+    textFields: [],
+    ariaLinks: [],
+    images: []
+  };
 
-    doc.querySelectorAll('h1, h2, p, a').forEach(el => {
-        content.textFields.push(el.innerText);
+  doc.querySelectorAll('h1, h2, p, a').forEach(el => {
+    content.textFields.push(el.innerText);
+  });
+
+  doc.querySelectorAll('[aria-label]').forEach(el => {
+    content.ariaLinks.push({
+      link: el.getAttribute('href'),
+      label: el.getAttribute('aria-label'),
+      target: el.getAttribute('target')
     });
+  });
 
-    doc.querySelectorAll('[aria-label]').forEach(el => {
-        content.ariaLinks.push({
-            link : el.getAttribute('href'),
-            label: el.getAttribute('aria-label'),
-            target: el.getAttribute('target')
-        });
+  doc.querySelectorAll('img').forEach(img => {
+    content.images.push({
+      src: img.getAttribute('src'),
+      alt: img.getAttribute('alt')
     });
+  });
 
-    doc.querySelectorAll('img').forEach(img => {
-        content.images.push({
-            src: img.getAttribute('src'),
-            alt: img.getAttribute('alt')
-        });
-    });
-
-    return content;
+  return content;
 }
-
-function displayDifferences(current, target) {
-    displayTable('text-comparison', current.textFields, target.textFields);
-    displayTable('aria-comparison', current.ariaLinks, target.ariaLinks);
-    displayTable('images-comparison', current.images, target.images);
-}
-
-// function displayTable(tableId, currentData, targetData) {
-//     const tbody = document.getElementById(tableId).querySelector('tbody');
-//     tbody.innerHTML = '';
-
-//     const maxLength = Math.max(currentData.length, targetData.length);
-//     for (let i = 0; i < maxLength; i++) {
-//         const row = document.createElement('tr');
-//         const currentCell = document.createElement('td');
-//         const targetCell = document.createElement('td');
-
-//         currentCell.innerText = currentData[i] ? JSON.stringify(currentData[i]) : '';
-//         targetCell.innerText = targetData[i] ? JSON.stringify(targetData[i]) : '';
-
-//         row.appendChild(currentCell);
-//         row.appendChild(targetCell);
-//         tbody.appendChild(row);
-//     }
-// }
 
 function displayDifferences(current, target) {
   displayTable('text-comparison', current.textFields, target.textFields);
@@ -272,66 +192,65 @@ function displayTable(tableId, currentData, targetData) {
 
   const maxLength = Math.max(currentData.length, targetData.length);
   for (let i = 0; i < maxLength; i++) {
-      const row = document.createElement('tr');
-      const currentCell = document.createElement('td');
-      const targetCell = document.createElement('td');
+    const row = document.createElement('tr');
+    const currentCell = document.createElement('td');
+    const targetCell = document.createElement('td');
 
-      const currentContent = currentData[i] ? JSON.stringify(currentData[i]) : '';
-      const targetContent = targetData[i] ? JSON.stringify(targetData[i]) : '';
+    const currentContent = currentData[i] ? JSON.stringify(currentData[i]) : '';
+    const targetContent = targetData[i] ? JSON.stringify(targetData[i]) : '';
 
-      currentCell.innerText = currentContent;
-      targetCell.innerText = targetContent;
+    currentCell.innerText = currentContent;
+    targetCell.innerText = targetContent;
 
-      if (currentContent !== targetContent) {
-          // Highlight the cells where the content is different
-          currentCell.style.backgroundColor = 'lightcoral';
-          targetCell.style.backgroundColor = 'lightcoral';
-      }
+    if (currentContent !== targetContent) {
+      // Highlight the cells where the content is different
+      currentCell.style.backgroundColor = 'lightcoral';
+      targetCell.style.backgroundColor = 'lightcoral';
+    }
 
-      row.appendChild(currentCell);
-      row.appendChild(targetCell);
-      tbody.appendChild(row);
+    row.appendChild(currentCell);
+    row.appendChild(targetCell);
+    tbody.appendChild(row);
   }
 }
 
-
 function downloadExcel() {
-    const wb = XLSX.utils.book_new();
-    wb.Props = {
-        Title: "Comparison Report",
-        Subject: "Page Comparison",
-        Author: "Your Name",
-        CreatedDate: new Date()
-    };
+  const wb = XLSX.utils.book_new();
+  wb.Props = {
+    Title: "Comparison Report",
+    Subject: "Page Comparison",
+    Author: "Your Name",
+    CreatedDate: new Date()
+  };
 
-    // Convert text fields comparison to worksheet
-    const textComparisonData = [["Current Page", "Target Page"]].concat(
-        Array.from(document.querySelectorAll('#text-comparison tbody tr')).map(row => {
-            return Array.from(row.cells).map(cell => cell.textContent);
-        })
-    );
-    const textComparisonSheet = XLSX.utils.aoa_to_sheet(textComparisonData);
-    XLSX.utils.book_append_sheet(wb, textComparisonSheet, "Text Fields Comparison");
+  // Convert text fields comparison to worksheet
+  const textComparisonData = [["Current Page", "Target Page"]].concat(
+    Array.from(document.querySelectorAll('#text-comparison tbody tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+  const textComparisonSheet = XLSX.utils.aoa_to_sheet(textComparisonData);
+  XLSX.utils.book_append_sheet(wb, textComparisonSheet, "Text Fields Comparison");
 
-    // Convert aria-label links comparison to worksheet
-    const ariaComparisonData = [["Current Page", "Target Page"]].concat(
-        Array.from(document.querySelectorAll('#aria-comparison tbody tr')).map(row => {
-            return Array.from(row.cells).map(cell => cell.textContent);
-        })
-    );
-    const ariaComparisonSheet = XLSX.utils.aoa_to_sheet(ariaComparisonData);
-    XLSX.utils.book_append_sheet(wb, ariaComparisonSheet, "ARIA-label Links Comparison");
+  // Convert aria-label links comparison to worksheet
+  const ariaComparisonData = [["Current Page", "Target Page"]].concat(
+    Array.from(document.querySelectorAll('#aria-comparison tbody tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+  const ariaComparisonSheet = XLSX.utils.aoa_to_sheet(ariaComparisonData);
+  XLSX.utils.book_append_sheet(wb, ariaComparisonSheet, "ARIA-label Links Comparison");
 
-    // Convert images comparison to worksheet
-    const imagesComparisonData = [["Current Page", "Target Page"]].concat(
-        Array.from(document.querySelectorAll('#images-comparison tbody tr')).map(row => {
-            return Array.from(row.cells).map(cell => cell.textContent);
-        })
-    );
-    const imagesComparisonSheet = XLSX.utils.aoa_to_sheet(imagesComparisonData);
-    XLSX.utils.book_append_sheet(wb, imagesComparisonSheet, "Images Comparison");
+  // Convert images comparison to worksheet
+  const imagesComparisonData = [["Current Page", "Target Page"]].concat(
+    Array.from(document.querySelectorAll('#images-comparison tbody tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+  const imagesComparisonSheet = XLSX.utils.aoa_to_sheet(imagesComparisonData);
+  XLSX.utils.book_append_sheet(wb, imagesComparisonSheet, "Images Comparison");
 
-    XLSX.writeFile(wb, 'comparison_report.xlsx');
+  XLSX.writeFile(wb, 'comparison_report.xlsx');
 }
 
 //clear Button
@@ -350,7 +269,6 @@ function displayAllLinks(links) {
   html += '</table>';
   document.getElementById('allLinksTable').innerHTML = html;
 }
-
 
 function displayBrokenLinks(links) {
   let html = '<table><tr><th>Broken Links</th><th>Status</th></tr>';
@@ -375,6 +293,16 @@ function displayLocalLanguageLinks(links) {
   document.getElementById('localLanguageLinksTable').innerHTML = html;
 }
 
+function displayHeading(headings) {
+  if (headings && headings.length > 0) {
+    let headingHtml = '<table><tr><th>Heading Tag</th><th>Text</th></tr>';
+    headings.forEach(heading => {
+      headingHtml += `<tr><td>${heading.tag}</td><td>${heading.text}</td></tr>`;
+    });
+    headingHtml += '</table>';
+    document.getElementById('headingTable').innerHTML = headingHtml;
+  }
+}
 
 function getLocalLanguageString(url) {
   const localLanguageList = [
@@ -394,7 +322,7 @@ function highlightPercent20(url) {
   return url.replace(/%20/g, '<span style="color: red;">%20</span>');
 }
 
-async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails) {
+async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading) {
   const allLinks = [];
   const brokenLinks = [];
   const localLanguageLinks = [];
@@ -403,8 +331,9 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
     'es-mx', 'fr-be', 'fr-ca', 'fr-fr', 'it-it', 'ko-kr', 'pt-br', 'de-de', 'ar-sa', 'da-dk', 'fi-fi', 'ja-jp', 'nb-no',
     'nl-be', 'nl-nl', 'zh-cn'
   ];
+  const headingHierarchy = [];
 
-  const links = Array.from(document.querySelectorAll('#primaryArea a')).map(link => ({
+  const links = Array.from(document.querySelectorAll('a')).map(link => ({
     url: link.href,
     text: link.textContent // Adding link text
   }));
@@ -423,13 +352,21 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
       if ((checkLocalLanguageLinks || checkAllDetails) && localLanguageList.some(language => link.url.includes(language))) {
         localLanguageLinks.push(link); // Push the entire link object
       }
+
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
-  return { allLinks, brokenLinks, localLanguageLinks };
-}
+  if (checkHeading || checkAllDetails) {
+    const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(heading => ({
+      tag: heading.tagName.toLowerCase(),
+      text: heading.textContent.trim()
+    }));
+    headingHierarchy.push(...headings);
+  }
 
+  return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy };
+}
 
 
