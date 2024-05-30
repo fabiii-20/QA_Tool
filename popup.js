@@ -264,6 +264,15 @@ function downloadExcel() {
   const imagesComparisonSheet = XLSX.utils.aoa_to_sheet(imagesComparisonData);
   XLSX.utils.book_append_sheet(wb, imagesComparisonSheet, "Images Comparison");
 
+  // Convert meta tag comparison to worksheet
+  const metaComparisonData = [["Current Page", "Target Page"]].concat(
+    Array.from(document.querySelectorAll('#meta-comparison tbody tr')).map(row => {
+        return Array.from(row.cells).map(cell => cell.textContent);
+    })
+);
+const metaComparisonSheet = XLSX.utils.aoa_to_sheet(metaComparisonData);
+XLSX.utils.book_append_sheet(wb, metaComparisonSheet, "Meta Tags Comparison");
+
   XLSX.writeFile(wb, 'comparison_report.xlsx');
 }
  /////////////////////////////////WORK-SHEET XLSX DOWNLOAD////////////////////////////////////////////////////////////-E
