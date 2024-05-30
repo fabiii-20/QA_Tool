@@ -83,7 +83,7 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
     Author: "Your Name",
     CreatedDate: new Date()
   };
-
+ /////////////////////////////////WORK-SHEET OF GENERATE XLSX DOWNLOAD////////////////////////////////////////////////////////-S
   // Convert all links to worksheet
   const allLinksData = [["", ""]].concat(
     Array.from(document.querySelectorAll('#allLinksTable tr')).map(row => {
@@ -113,6 +113,8 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
 
   XLSX.writeFile(wb, 'links_report.xlsx');
 });
+ /////////////////////////////////WORK-SHEET OF GENERATE XLSX DOWNLOAD////////////////////////////////////////////////////////-E
+
 
 //compare functionalities
 document.getElementById('compare-button').addEventListener('click', comparePages);
@@ -155,7 +157,8 @@ function extractPageContent(doc) {
   const content = {
     textFields: [],
     ariaLinks: [],
-    images: []
+    images: [],
+    metaTags:[]
   };
 
   doc.querySelectorAll('h1, h2, p, a').forEach(el => {
@@ -177,6 +180,15 @@ function extractPageContent(doc) {
     });
   });
 
+  doc.querySelectorAll('meta').forEach(meta => {
+    const tagName = meta.getAttribute('name') || meta.getAttribute('property') || meta.getAttribute('http-equiv');
+    const contentValue = meta.getAttribute('content');
+
+    if (tagName && contentValue) {
+        content.metaTags.push({ tagName, contentValue });
+    }
+});
+
   return content;
 }
 
@@ -184,6 +196,7 @@ function displayDifferences(current, target) {
   displayTable('text-comparison', current.textFields, target.textFields);
   displayTable('aria-comparison', current.ariaLinks, target.ariaLinks);
   displayTable('images-comparison', current.images, target.images);
+  displayTable('meta-comparison', current.metaTags, target.metaTags);
 }
 
 function displayTable(tableId, currentData, targetData) {
@@ -223,6 +236,7 @@ function downloadExcel() {
     CreatedDate: new Date()
   };
 
+  /////////////////////////////////WORK-SHEET OF COMPARISON XLSX DOWNLOAD/////////////////////////////////////////////-S
   // Convert text fields comparison to worksheet
   const textComparisonData = [["Current Page", "Target Page"]].concat(
     Array.from(document.querySelectorAll('#text-comparison tbody tr')).map(row => {
@@ -252,7 +266,7 @@ function downloadExcel() {
 
   XLSX.writeFile(wb, 'comparison_report.xlsx');
 }
-
+ /////////////////////////////////WORK-SHEET XLSX DOWNLOAD////////////////////////////////////////////////////////////-E
 //clear Button
 document.getElementById('clear').addEventListener('click', () => {
   localStorage.removeItem('linkResults');
