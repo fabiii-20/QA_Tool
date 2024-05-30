@@ -1,3 +1,8 @@
-https://www.microsoft.com/en-us/nonprofits?sr20=msc#starlight-children%E2%80%99s-foundation
-The site for testing
+const links = Array.from(document.querySelectorAll('a')).map(link => ({
+    url: link.href,
+    text: link.textContent 
+  }));
+//Here we can change the required id name or classname to skip UHF
+
+
 

@@ -335,7 +335,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
 
   const links = Array.from(document.querySelectorAll('a')).map(link => ({
     url: link.href,
-    text: link.textContent // Adding link text
+    text: link.textContent 
   }));
 
   for (const link of links) {
