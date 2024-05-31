@@ -270,8 +270,7 @@ h2 {
 
 Move the Generate button and Preview button to the left side */
 #doneButton,#previewButton {
-  margin-right: 370px;
-  margin-top: 30px; /* Add margin to separate buttons
+  margin-top: 30px;
 }
 
 /* Move the two download buttons to the right side */
@@ -284,9 +283,15 @@ Move the Generate button and Preview button to the left side */
 /* #downloadPdfButton,
 #downloadExcelButton {
   margin-left: 2%; /* Add margin between buttons */
-} 
+  #doneButton{
+    margin-right: 10px;
+  }
+  #clear{
+    margin-right: 10px;
+  }
+  
 #previewButton{
-  margin-left: -px;
+  margin-right: 180px;
 } 
 
 #compare-button{
@@ -401,4 +406,92 @@ input:checked + .slider {
 
 input:checked + .slider:before {
   transform: translateX(20px);
+}
+
+
+.night-mode {
+  background-color: #333;
+  color: #fff;
+}
+
+/* Example of changing specific element styles in night mode */
+.night-mode #header #initial-view #check-list{
+  background-color: #333;
+}
+
+#initial-view {
+  /* Existing styles for initial view */
+  width: 640px;
+  padding: 30px;
+  text-align: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #f9f9f9;
+  border: 2px solid #d3c3c3;
+  border-radius: 20px;
+}
+
+/* Additional styles for night mode within #initial-view */
+.night-mode #initial-view {
+  background-color: #333; /* Adjust background color for night mode */
+  color: rgb(234, 234, 234); /* Adjust text color for night mode */
+}
+
+/* Additional styles for night mode within #initial-view */
+.night-mode #initial-view {
+  background-color: #333; /* Adjust background color for night mode */
+  color: rgb(234, 234, 234); /* Adjust text color for night mode */
+}
+
+/* Change text color of text boxes to white in night mode */
+/* .night-mode #initial-view input[type="text"],
+.night-mode #initial-view textarea {
+  color: #fff;
+} */
+.night-mode #initial-view label  {
+  color:rgb(234, 234, 234);
+}
+
+/* Night Mode styles #1A202C;*/
+.night-mode {
+  background-color: rgb(117, 117, 117); 
+  color: rgb(234, 234, 234);
+}
+
+/* Update buttons in the initial view */
+.night-mode #compare-button,
+.night-mode #doneButton,
+.night-mode #previewButton,
+.night-mode #clear,
+.night-mode #downloadPdfButton,
+.night-mode #downloadExcelButton {
+  background-color: #404040; /* Adjust background color */
+  color:rgb(234, 234, 234); /* Adjust text color */
+  border-color:rgb(234, 234, 234); /* Adjust border color */
+}
+
+/* Update icons in the download buttons */
+.night-mode #downloadPdfButton i.fa-file-pdf,
+.night-mode #downloadExcelButton i.fa-file-excel {
+  color: #ff6347; /* Adjust icon color */
+}
+
+/* Update text color for checkbox labels */
+.night-mode .checkbox-container label  {
+  color:rgb(234, 234, 234); /* Adjust text color */
+}
+#nightModeButton {
+  /* background-color: transparent; */
+  /* border: none; */
+  color: #150303;
+  font-size: 16px;
+  cursor: pointer;
+  position: absolute;
+  top: 10px; /* Adjust top position */
+  right: 10px; /* Adjust right position */
+  border-radius: 10px;
+}
+
+#nightModeButton .fa-moon {
+  color: black; /* Set moon icon color to black */
+  
 }
