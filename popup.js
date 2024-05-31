@@ -4,8 +4,10 @@ document.getElementById('doneButton').addEventListener('click', async () => {
   const checkLocalLanguageLinks = document.getElementById('checkLocalLanguageLinks').checked;
   const checkAllDetails = document.getElementById('checkAllDetails').checked;
   const checkHeading = document.getElementById('checkHeading').checked;
+  const ariaCheck = document.getElementById('ariaCheck').checked;
+  const imageCheck = document.getElementById('imageCheck').checked;
 
-  if (!checkAllLinks && !checkBrokenLinks && !checkLocalLanguageLinks && !checkAllDetails && !checkHeading) {
+  if (!checkAllLinks && !checkBrokenLinks && !checkLocalLanguageLinks && !checkAllDetails && !checkHeading && !ariaCheck && !imageCheck) {
     alert('Please check at least one checkbox.');
     return;
   }
@@ -35,7 +37,7 @@ document.getElementById('doneButton').addEventListener('click', async () => {
     const [{ result }] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: checkLinks,
-      args: [checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading]
+      args: [checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading, ariaCheck, imageCheck]
     });
 
     console.log('Link check result:', result); // Debugging
@@ -70,6 +72,8 @@ document.getElementById('previewButton').addEventListener('click', () => {
     displayBrokenLinks(results.brokenLinks);
     displayLocalLanguageLinks(results.localLanguageLinks);
     displayHeading(results.headingHierarchy);
+    displayAria(results.ariaDetails);
+    displayImages(results.imageDetails);
   } else {
     alert('No data to preview. Please click "Done" first.');
   }
@@ -291,6 +295,7 @@ function displayAllLinks(links) {
   });
   html += '</table>';
   document.getElementById('allLinksTable').innerHTML = html;
+
 }
 
 function displayBrokenLinks(links) {
@@ -301,6 +306,7 @@ function displayBrokenLinks(links) {
   });
   html += '</table>';
   document.getElementById('brokenLinksTable').innerHTML = html;
+
 }
 
 function displayLocalLanguageLinks(links) {
@@ -324,8 +330,28 @@ function displayHeading(headings) {
     });
     headingHtml += '</table>';
     document.getElementById('headingTable').innerHTML = headingHtml;
+
   }
 }
+
+function displayAria(ariaDetails) {
+  let html = '<table><tr><th>Element</th><th>ARIA Label</th><th>Link</th><th>Target</th></tr>';
+  ariaDetails.forEach(detail => {
+    html += `<tr><td>${detail.element}</td><td>${detail.ariaLabel}</td><td>${detail.link}</td><td>${detail.target}</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('ariaTable').innerHTML = html;
+}
+
+function displayImages(imageDetails) {
+  let html = '<table><tr><th>Image Source</th><th>Alt Text</th></tr>';
+  imageDetails.forEach(detail => {
+    html += `<tr><td>${detail.src}</td><td>${detail.alt}</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('imageTable').innerHTML = html;
+}
+
 
 function getLocalLanguageString(url) {
   const localLanguageList = [
@@ -345,7 +371,7 @@ function highlightPercent20(url) {
   return url.replace(/%20/g, '<span style="color: red;">%20</span>');
 }
 
-async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading) {
+async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading, ariaCheck, imageCheck) {
   const allLinks = [];
   const brokenLinks = [];
   const localLanguageLinks = [];
@@ -355,6 +381,8 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
     'nl-be', 'nl-nl', 'zh-cn'
   ];
   const headingHierarchy = [];
+  const ariaDetails = [];
+  const imageDetails = [];
 
   const links = Array.from(document.querySelectorAll('a')).map(link => ({
     url: link.href,
@@ -373,7 +401,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
       }
 
       if ((checkLocalLanguageLinks || checkAllDetails) && localLanguageList.some(language => link.url.includes(language))) {
-        localLanguageLinks.push(link); // Push the entire link object
+        localLanguageLinks.push(link);
       }
 
     } catch (error) {
@@ -389,7 +417,24 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
     headingHierarchy.push(...headings);
   }
 
-  return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy };
-}
+  if (ariaCheck || checkAllDetails) {
+    const ariaElements = Array.from(document.querySelectorAll('[aria-label]')).map(element => ({
+      element: element.tagName.toLowerCase(),
+      ariaLabel: element.getAttribute('aria-label'),
+      target: element.getAttribute('href') || element.getAttribute('target') || '',
+      link: element.href || element.closest('a')?.href || ''
+    }));
+    ariaDetails.push(...ariaElements);
+  }
 
+  if (imageCheck || checkAllDetails) {
+    const images = Array.from(document.querySelectorAll('img')).map(img => ({
+      src: img.src,
+      alt: img.alt || 'No alt text'
+    }));
+    imageDetails.push(...images);
+  }
+
+  return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails };
+  }
 
