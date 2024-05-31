@@ -120,16 +120,30 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
  /////////////////////////////////WORK-SHEET OF GENERATE XLSX DOWNLOAD////////////////////////////////////////////////////////-E
 
 
-//compare functionalities
-document.getElementById('compare-button').addEventListener('click', comparePages);
-document.getElementById('downloadExcelButton').addEventListener('click', downloadExcel);
+//compare functionalities////////////////////////////////////////////////////////
 
 async function comparePages() {
   const targetUrl = document.getElementById('compare-url').value;
   if (!targetUrl) {
-    alert('Please enter a URL to compare.');
-    return;
+      alert('Please enter a URL to compare.');
+      return;
   }
+
+  let countdownTime = 300; // Set countdown time in seconds (5 minutes)
+  const countdownElement = document.getElementById('countdown');
+  countdownElement.style.display = 'block'; // Ensure countdown element is visible
+  updateCountdown(countdownElement, countdownTime);
+
+  const countdownInterval = setInterval(() => {
+      countdownTime -= 1;
+      updateCountdown(countdownElement, countdownTime);
+
+      if (countdownTime <= 0) {
+          clearInterval(countdownInterval);
+          countdownElement.textContent = 'Time is up!';
+          document.getElementById('loadingComplete').style.display = 'block'; // Show "Loading complete" message
+      }
+  }, 1000);
 
   // Fetch current page content
   const currentTab = await getCurrentTab();
@@ -147,7 +161,41 @@ async function comparePages() {
 
   // Compare and display differences
   displayDifferences(currentPageContent, targetPageContent);
+  document.getElementById('comparisonResults').style.display = 'block'; // Show the result section
+
+  // Stop the timer and hide it
+  clearInterval(countdownInterval);
+  countdownElement.style.display = 'none';
 }
+
+
+document.getElementById('compare-button').addEventListener('click', comparePages);
+document.getElementById('downloadExcelButton').addEventListener('click', downloadExcel);
+////////////////////////////////////////////////////////////////////////////////////////
+// async function comparePages() {
+//   const targetUrl = document.getElementById('compare-url').value;
+//   if (!targetUrl) {
+//     alert('Please enter a URL to compare.');
+//     return;
+//   }
+
+//   // Fetch current page content
+//   const currentTab = await getCurrentTab();
+//   const currentUrl = currentTab.url;
+//   const currentResponse = await fetch(currentUrl);
+//   const currentPageHTML = await currentResponse.text();
+//   const currentDoc = new DOMParser().parseFromString(currentPageHTML, 'text/html');
+//   const currentPageContent = extractPageContent(currentDoc);
+
+//   // Fetch target page content
+//   const targetResponse = await fetch(targetUrl);
+//   const targetPageHTML = await targetResponse.text();
+//   const targetDoc = new DOMParser().parseFromString(targetPageHTML, 'text/html');
+//   const targetPageContent = extractPageContent(targetDoc);
+
+//   // Compare and display differences
+//   displayDifferences(currentPageContent, targetPageContent);
+// }
 
 async function getCurrentTab() {
   return new Promise(resolve => {
@@ -283,9 +331,15 @@ XLSX.utils.book_append_sheet(wb, metaComparisonSheet, "Meta Tags Comparison");
 //clear Button
 document.getElementById('clear').addEventListener('click', () => {
   localStorage.removeItem('linkResults');
-  document.getElementById('result').style.display = 'none'; // Hide the result section after clearing
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('comparisonResults').style.display = 'none'; // Hide the result section after clearing
+  
+  // Uncheck all checkboxes/////////////////////////////////////////////////
+  document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
 });
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function displayAllLinks(links) {
   let html = '<table><tr><th>All Links</th><th>Status</th></tr>';
   links.forEach(link => {
@@ -438,3 +492,34 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails };
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+  document.addEventListener('DOMContentLoaded', function() {
+    const nightModeButton = document.getElementById('nightModeButton');
+    const body = document.body;
+  
+    nightModeButton.addEventListener('click', function() {
+      // Toggle night mode class on body
+      body.classList.toggle('night-mode');
+      // Change button text and symbol based on night mode state
+      if (body.classList.contains('night-mode')) {
+        nightModeButton.innerHTML = '<i class="fas fa-sun"></i> ';
+      } else {
+        nightModeButton.innerHTML = '<i class="fa-solid fa-moon"></i> ';
+      }
+    });
+  });
+  /////////////////////////////////////////////////////////////////////////////////
