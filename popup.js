@@ -6,8 +6,10 @@ document.getElementById('doneButton').addEventListener('click', async () => {
   const checkHeading = document.getElementById('checkHeading').checked;
   const ariaCheck = document.getElementById('ariaCheck').checked;
   const imageCheck = document.getElementById('imageCheck').checked;
+  const checkMeta = document.getElementById('metaCheck').checked;
+  const checkAka = document.getElementById('akaCheck').checked;
 
-  if (!checkAllLinks && !checkBrokenLinks && !checkLocalLanguageLinks && !checkAllDetails && !checkHeading && !ariaCheck && !imageCheck) {
+  if (!checkAllLinks && !checkBrokenLinks && !checkLocalLanguageLinks && !checkAllDetails && !checkHeading && !ariaCheck && !imageCheck && !checkMeta && !checkAka) {
     alert('Please check at least one checkbox.');
     return;
   }
@@ -37,7 +39,7 @@ document.getElementById('doneButton').addEventListener('click', async () => {
     const [{ result }] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: checkLinks,
-      args: [checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading, ariaCheck, imageCheck]
+      args: [checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading, ariaCheck, imageCheck,checkMeta, checkAka]
     });
 
     console.log('Link check result:', result); // Debugging
@@ -74,6 +76,8 @@ document.getElementById('previewButton').addEventListener('click', () => {
     displayHeading(results.headingHierarchy);
     displayAria(results.ariaDetails);
     displayImages(results.imageDetails);
+    displayMeta(results.metaDetails);
+    displayAkaLinks(results.akaLinks);
   } else {
     alert('No data to preview. Please click "Done" first.');
   }
@@ -334,12 +338,12 @@ document.getElementById('clear').addEventListener('click', () => {
   document.getElementById('result').style.display = 'none';
   document.getElementById('comparisonResults').style.display = 'none'; // Hide the result section after clearing
   
-  // Uncheck all checkboxes/////////////////////////////////////////////////
+  // Uncheck all checkboxes/////////////////////////////////////////////////Clear
   document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
     checkbox.checked = false;
   });
 });
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////Functions for check BOXES
 function displayAllLinks(links) {
   let html = '<table><tr><th>All Links</th><th>Status</th></tr>';
   links.forEach(link => {
@@ -389,9 +393,9 @@ function displayHeading(headings) {
 }
 
 function displayAria(ariaDetails) {
-  let html = '<table><tr><th>Element</th><th>ARIA Label</th><th>Link</th><th>Target</th></tr>';
+  let html = '<table><tr><th>Element</th><th>ARIA Label</th><th>Link';
   ariaDetails.forEach(detail => {
-    html += `<tr><td>${detail.element}</td><td>${detail.ariaLabel}</td><td>${detail.link}</td><td>${detail.target}</td></tr>`;
+    html += `<tr><td>${detail.element}</td><td>${detail.ariaLabel}</td><td>${detail.link}`;
   });
   html += '</table>';
   document.getElementById('ariaTable').innerHTML = html;
@@ -405,6 +409,28 @@ function displayImages(imageDetails) {
   html += '</table>';
   document.getElementById('imageTable').innerHTML = html;
 }
+
+function displayMeta(metaDetails) {
+  let html = '<table><tr><th>Tag Name</th><th>Content Value</th></tr>';
+  metaDetails.forEach(meta => {
+      html += `<tr><td>${meta.tagName}</td><td>${meta.content}</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('metaTable').innerHTML = html;
+}
+
+
+function displayAkaLinks(akaLinks) {
+  const akaLinksFiltered = akaLinks.filter(link => link.url.includes('aka.ms')); // Filter to include only aka.ms links
+  let html = '<table><tr><th>URL</th></tr>';
+  akaLinksFiltered.forEach(link => {
+    html += `<tr><td>${link.url}</td></tr>`; // Display only the URL
+  });
+  html += '</table>';
+  document.getElementById('akaTable').innerHTML = html;
+}
+
+
 
 
 function getLocalLanguageString(url) {
@@ -425,7 +451,7 @@ function highlightPercent20(url) {
   return url.replace(/%20/g, '<span style="color: red;">%20</span>');
 }
 
-async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading, ariaCheck, imageCheck) {
+async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading, ariaCheck, imageCheck, checkMeta, checkAka) {
   const allLinks = [];
   const brokenLinks = [];
   const localLanguageLinks = [];
@@ -437,6 +463,8 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   const headingHierarchy = [];
   const ariaDetails = [];
   const imageDetails = [];
+  const metaDetails = [];
+  const akaLinks = [];
 
   const links = Array.from(document.querySelectorAll('a')).map(link => ({
     url: link.href,
@@ -475,7 +503,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
     const ariaElements = Array.from(document.querySelectorAll('[aria-label]')).map(element => ({
       element: element.tagName.toLowerCase(),
       ariaLabel: element.getAttribute('aria-label'),
-      target: element.getAttribute('href') || element.getAttribute('target') || '',
+      target: element.getAttribute('href') ||'',
       link: element.href || element.closest('a')?.href || ''
     }));
     ariaDetails.push(...ariaElements);
@@ -489,7 +517,26 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
     imageDetails.push(...images);
   }
 
-  return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails };
+
+  if (checkMeta || checkAllDetails) {
+    const metaTags = Array.from(document.querySelectorAll('meta')).map(metaTag => ({
+        tagName: metaTag.getAttribute('name') || metaTag.getAttribute('property') || metaTag.getAttribute('http-equiv'),
+        content: metaTag.getAttribute('content')
+    })).filter(meta => meta.tagName && meta.content); // Filter to only include meta tags with both tagName and content
+    metaDetails.push(...metaTags);
+}
+
+// Aka Check
+// Aka Check
+if (checkAka || checkAllDetails) {
+  const links = Array.from(document.querySelectorAll('a')).map(link => ({
+      url: link.href,
+      status: link.href.includes('aka.ms') ? 'aka.ms' : 'Normal URL'
+  }));
+  akaLinks.push(...links);
+}
+
+  return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails, metaDetails, akaLinks};
   }
 
 
