@@ -109,14 +109,15 @@
         </div>
       </div>
 
+     <div>
       <div class="switch-container">
         <label class="switch">
           <input type="checkbox" id="toggleSelector">
           <span class="slider round"></span>
         </label>
-        <label for="toggleSelector">Use primaryArea Selector</label>
+        <label for="toggleSelector">Skip UHF</label>
       </div>
-      
+      <br><br>
     
           <div id="text-area">
             <textarea
@@ -129,6 +130,7 @@
             <button id="compare-button">Compare</button>
           </div>
         </div>
+      </div>
         
         <div>
     <form id="optionsForm">
@@ -198,27 +200,35 @@
   </div>
     <div id="result" style="display:none;">
       <h2>Results</h2>
+      <h4>All links</h4>
       <div id="allLinksTable">
       </div>
 
+      <h4>Broken links</h4>
       <div id="brokenLinksTable">
       </div>
 
+      <h4>Language Locals</h4>
       <div id="localLanguageLinksTable">
       </div>
       
+      <h4>Headings</h4>
       <div id="headingTable">
       </div>
 
+      <h4>Aria labels</h4>
       <div id="ariaTable">
       </div>
 
+      <h4>Image src and alt texts</h4>
       <div id="imageTable">
       </div>
 
+      <h4>Page Properties</h4>
       <div id="metaTable">
       </div>
 
+      <h4>Short URLs</h4>
       <div id="akaTable">
       </div>
 

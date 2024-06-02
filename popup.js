@@ -119,8 +119,65 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
   const localLanguageLinksSheet = XLSX.utils.aoa_to_sheet(localLanguageLinksData);
   XLSX.utils.book_append_sheet(wb, localLanguageLinksSheet, "Local Language Links");
 
+  
+
+  // Convert Headings to worksheet
+  const headingsData = [["", ""]].concat(
+    Array.from(document.querySelectorAll('#headingTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+  const HeadingsSheet = XLSX.utils.aoa_to_sheet(headingsData);
+  XLSX.utils.book_append_sheet(wb, HeadingsSheet, "Headings");
+
+ 
+
+  // Convert AriaLabel to worksheet
+  const ariaData = [["", ""]].concat(
+    Array.from(document.querySelectorAll('#ariaTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+  const ariaSheet = XLSX.utils.aoa_to_sheet(ariaData);
+  XLSX.utils.book_append_sheet(wb, ariaSheet, "Aria Label Details");
+
+
+
+   // Convert Images to worksheet
+   const imageData = [["", ""]].concat(
+    Array.from(document.querySelectorAll('#imageTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+  const imageSheet = XLSX.utils.aoa_to_sheet(imageData);
+  XLSX.utils.book_append_sheet(wb, imageSheet, "Image Details");
+
+
+
+   // Convert Meta to worksheet
+   const metaData = [["", ""]].concat(
+    Array.from(document.querySelectorAll('#metaTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+  const metaSheet = XLSX.utils.aoa_to_sheet(metaData);
+  XLSX.utils.book_append_sheet(wb, metaSheet, "Page Property Details");
+
+  
+
+   // Convert aka.ms to worksheet
+   const akaData = [["", ""]].concat(
+    Array.from(document.querySelectorAll('#akaTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+  const akaSheet = XLSX.utils.aoa_to_sheet(akaData);
+  XLSX.utils.book_append_sheet(wb, akaSheet, "Short URL Details");
+
   XLSX.writeFile(wb, 'links_report.xlsx');
 });
+
+
  /////////////////////////////////WORK-SHEET OF GENERATE XLSX DOWNLOAD////////////////////////////////////////////////////////-E
 
 
@@ -466,7 +523,16 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   const metaDetails = [];
   const akaLinks = [];
 
-  const links = Array.from(document.querySelectorAll('a')).map(link => ({
+  const toggleSelector = document.getElementById('toggleSelector');
+  const primaryAreaSelector = toggleSelector.checked ? '#primaryArea ' : '';
+
+  const linksSelector = `${primaryAreaSelector}a`;
+  const headingSelector = `${primaryAreaSelector}h1, ${primaryAreaSelector}h2, ${primaryAreaSelector}h3, ${primaryAreaSelector}h4, ${primaryAreaSelector}h5, ${primaryAreaSelector}h6`;
+  const ariaSelector = `${primaryAreaSelector}[aria-label]`;
+  const imageSelector = `${primaryAreaSelector}img`;
+  const metaSelector = `${primaryAreaSelector}meta`;
+
+  const links = Array.from(document.querySelectorAll(linksSelector)).map(link => ({
     url: link.href,
     text: link.textContent 
   }));
@@ -492,7 +558,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   }
 
   if (checkHeading || checkAllDetails) {
-    const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(heading => ({
+    const headings = Array.from(document.querySelectorAll(headingSelector)).map(heading => ({
       tag: heading.tagName.toLowerCase(),
       text: heading.textContent.trim()
     }));
@@ -500,7 +566,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   }
 
   if (ariaCheck || checkAllDetails) {
-    const ariaElements = Array.from(document.querySelectorAll('[aria-label]')).map(element => ({
+    const ariaElements = Array.from(document.querySelectorAll(ariaSelector)).map(element => ({
       element: element.tagName.toLowerCase(),
       ariaLabel: element.getAttribute('aria-label'),
       target: element.getAttribute('href') ||'',
@@ -510,7 +576,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   }
 
   if (imageCheck || checkAllDetails) {
-    const images = Array.from(document.querySelectorAll('img')).map(img => ({
+    const images = Array.from(document.querySelectorAll(imageSelector)).map(img => ({
       src: img.src,
       alt: img.alt || 'No alt text'
     }));
@@ -519,25 +585,25 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
 
 
   if (checkMeta || checkAllDetails) {
-    const metaTags = Array.from(document.querySelectorAll('meta')).map(metaTag => ({
+    const metaTags = Array.from(document.querySelectorAll(metaSelector)).map(metaTag => ({
         tagName: metaTag.getAttribute('name') || metaTag.getAttribute('property') || metaTag.getAttribute('http-equiv'),
         content: metaTag.getAttribute('content')
     })).filter(meta => meta.tagName && meta.content); // Filter to only include meta tags with both tagName and content
     metaDetails.push(...metaTags);
-}
+  }
 
-// Aka Check
-// Aka Check
-if (checkAka || checkAllDetails) {
-  const links = Array.from(document.querySelectorAll('a')).map(link => ({
-      url: link.href,
-      status: link.href.includes('aka.ms') ? 'aka.ms' : 'Normal URL'
-  }));
-  akaLinks.push(...links);
-}
+  // Aka Check
+  if (checkAka || checkAllDetails) {
+    const links = Array.from(document.querySelectorAll(linksSelector)).map(link => ({
+        url: link.href,
+        status: link.href.includes('aka.ms') ? 'aka.ms' : 'Normal URL'
+    }));
+    akaLinks.push(...links);
+  }
 
   return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails, metaDetails, akaLinks};
-  }
+}
+
 
 
 
