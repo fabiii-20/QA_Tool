@@ -119,9 +119,7 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
   const localLanguageLinksSheet = XLSX.utils.aoa_to_sheet(localLanguageLinksData);
   XLSX.utils.book_append_sheet(wb, localLanguageLinksSheet, "Local Language Links");
 
-  
-
-  // Convert Headings to worksheet
+    // Convert Headings to worksheet
   const headingsData = [["", ""]].concat(
     Array.from(document.querySelectorAll('#headingTable tr')).map(row => {
       return Array.from(row.cells).map(cell => cell.textContent);
@@ -176,8 +174,6 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
 
   XLSX.writeFile(wb, 'links_report.xlsx');
 });
-
-
  /////////////////////////////////WORK-SHEET OF GENERATE XLSX DOWNLOAD////////////////////////////////////////////////////////-E
 
 
@@ -524,7 +520,8 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   const akaLinks = [];
 
   const toggleSelector = document.getElementById('toggleSelector');
-  const primaryAreaSelector = toggleSelector.checked ? '#primaryArea ' : '';
+  const primaryAreaSelector = toggleSelector && toggleSelector.checked ? '#primaryArea ' : '';
+ 
 
   const linksSelector = `${primaryAreaSelector}a`;
   const headingSelector = `${primaryAreaSelector}h1, ${primaryAreaSelector}h2, ${primaryAreaSelector}h3, ${primaryAreaSelector}h4, ${primaryAreaSelector}h5, ${primaryAreaSelector}h6`;
@@ -590,20 +587,20 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
         content: metaTag.getAttribute('content')
     })).filter(meta => meta.tagName && meta.content); // Filter to only include meta tags with both tagName and content
     metaDetails.push(...metaTags);
-  }
-
-  // Aka Check
-  if (checkAka || checkAllDetails) {
-    const links = Array.from(document.querySelectorAll(linksSelector)).map(link => ({
-        url: link.href,
-        status: link.href.includes('aka.ms') ? 'aka.ms' : 'Normal URL'
-    }));
-    akaLinks.push(...links);
-  }
-
-  return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails, metaDetails, akaLinks};
 }
 
+// Aka Check
+// Aka Check
+if (checkAka || checkAllDetails) {
+  const links = Array.from(document.querySelectorAll('a')).map(link => ({
+      url: link.href,
+      status: link.href.includes('aka.ms') ? 'aka.ms' : 'Normal URL'
+  }));
+  akaLinks.push(...links);
+}
+
+  return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails, metaDetails, akaLinks};
+  }
 
 
 
@@ -635,4 +632,21 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
       }
     });
   });
-  /////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////Checkbox///////////////////////////////////////
+  document.addEventListener("DOMContentLoaded", function() {
+    var checkAllDetails = document.getElementById("checkAllDetails");
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]:not(#toggleSelector)');
+    
+    // Function to toggle other checkboxes based on Check all details checkbox
+    function toggleCheckboxes() {
+        checkboxes.forEach(function(checkbox) {
+            if (checkbox !== checkAllDetails) {
+                checkbox.checked = checkAllDetails.checked;
+            }
+        });
+    }
+    
+    // Event listener for Check all details checkbox
+    checkAllDetails.addEventListener("change", toggleCheckboxes);
+  });
+  ////////////////////////////////////////////////////////////////////////////////////
