@@ -79,17 +79,24 @@ document.getElementById('previewButton').addEventListener('click', () => {
     displayMeta(results.metaDetails);
     displayAkaLinks(results.akaLinks);
   } else {
-    alert('No data to preview. Please click "Done" first.');
+    alert('No data to preview. Please click "Generate" first.');
   }
 });
 
+
 document.getElementById('downloadExcelButton').addEventListener('click', () => {
   // Retrieve data directly from the DOM
+  const results = JSON.parse(localStorage.getItem('linkResults'));
+  if (results) {
   const allLinksData = [["URL", "Status"]].concat(
     Array.from(document.querySelectorAll('#allLinksTable tr')).map(row => {
       return Array.from(row.cells).map(cell => cell.textContent);
     })
   );
+    if (allLinksData.length <= 1) { // Length will be 1 if there's only the header row
+    alert('No data available to download.');
+    return;
+  }
 
   const brokenLinksData = [["URL", "Status"]].concat(
     Array.from(document.querySelectorAll('#brokenLinksTable tr')).map(row => {
@@ -102,10 +109,6 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
       return Array.from(row.cells).map(cell => cell.textContent);
     })
   );
-
-  // Repeat the same process for other tables
-
-  // Convert Headings to worksheet
   const headingsData = [["Tag", "Text"]].concat(
     Array.from(document.querySelectorAll('#headingTable tr')).map(row => {
       return Array.from(row.cells).map(cell => cell.textContent);
@@ -167,6 +170,9 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
 
   // Trigger the download
   XLSX.writeFile(wb, 'links_report.xlsx');
+} else {
+  alert('No data to download. Please click "Generate" first.');
+}
 });
 
  /////////////////////////////////WORK-SHEET OF GENERATE XLSX DOWNLOAD////////////////////////////////////////////////////////-E
@@ -430,15 +436,22 @@ function displayLocalLanguageLinks(links) {
 
 function displayHeading(headings) {
   if (headings && headings.length > 0) {
+    // Sort headings based on the heading tag (h1, h2, ...)
+    headings.sort((a, b) => {
+      const tagA = parseInt(a.tag.replace('h', ''));
+      const tagB = parseInt(b.tag.replace('h', ''));
+      return tagA - tagB;
+    });
+
     let headingHtml = '<table><tr><th>Heading Tag</th><th>Text</th></tr>';
     headings.forEach(heading => {
       headingHtml += `<tr><td>${heading.tag}</td><td>${heading.text}</td></tr>`;
     });
     headingHtml += '</table>';
     document.getElementById('headingTable').innerHTML = headingHtml;
-
   }
 }
+  
 
 function displayAria(ariaDetails) {
   let html = '<table><tr><th>Element</th><th>ARIA Label</th><th>Link';
@@ -524,7 +537,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   // const imageSelector = `${primaryAreaSelector}img`;
   // const metaSelector = `${primaryAreaSelector}meta`;
 
-  const links = Array.from(document.querySelectorAll('a')).map(link => ({
+  const links = Array.from(document.querySelectorAll('#primaryArea a')).map(link => ({
     url: link.href,
     text: link.textContent 
   }));
