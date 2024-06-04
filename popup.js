@@ -420,8 +420,8 @@ function displayLocalLanguageLinks(links) {
   links.forEach(link => {
     const linkElement = document.createElement('a');
     linkElement.href = link.url;
-    linkElement.textContent = link.text; // Extracting link text from the anchor element
-    const linkText = linkElement.innerHTML; // Using innerHTML to get the rendered HTML content of the anchor element
+    // linkElement.textContent = link.text; // Extracting link text from the anchor element
+    // const linkText = linkElement.innerHTML; // Using innerHTML to get the rendered HTML content of the anchor element
     html += `<tr><td>${link.url}</td><td>${getLocalLanguageString(link.url)}</td><td>${linkText}</td></tr>`;
   });
   html += '</tbody></table>';
@@ -469,9 +469,8 @@ function displayMeta(metaDetails) {
 
 
 function displayAkaLinks(akaLinks) {
-  const akaLinksFiltered = akaLinks.filter(link => link.url.includes('aka.ms')); // Filter to include only aka.ms links
   let html = '<table><tr><th>URL</th></tr>';
-  akaLinksFiltered.forEach(link => {
+  akaLinks.forEach(link => {
     html += `<tr><td>${link.url}</td></tr>`; // Display only the URL
   });
   html += '</table>';
@@ -524,7 +523,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   // const imageSelector = `${primaryAreaSelector}img`;
   // const metaSelector = `${primaryAreaSelector}meta`;
 
-  const links = Array.from(document.querySelectorAll('a')).map(link => ({
+  const links = Array.from(document.querySelectorAll('#primaryArea a')).map(link => ({
     url: link.href,
     text: link.textContent 
   }));
@@ -550,7 +549,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   }
 
   if (checkHeading || checkAllDetails) {
-    const headings = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6')).map(heading => ({
+    const headings = Array.from(document.querySelectorAll('#primaryArea h1,#primaryArea h2,#primaryArea h3,#primaryArea h4,#primaryArea h5,#primaryArea h6')).map(heading => ({
       tag: heading.tagName.toLowerCase(),
       text: heading.textContent.trim()
     }));
@@ -558,7 +557,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   }
 
   if (ariaCheck || checkAllDetails) {
-    const ariaElements = Array.from(document.querySelectorAll('[aria-label]')).map(element => ({
+    const ariaElements = Array.from(document.querySelectorAll('#primaryArea [aria-label]')).map(element => ({
       element: element.tagName.toLowerCase(),
       ariaLabel: element.getAttribute('aria-label'),
       target: element.getAttribute('href') ||'',
@@ -568,7 +567,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   }
 
   if (imageCheck || checkAllDetails) {
-    const images = Array.from(document.querySelectorAll('img')).map(img => ({
+    const images = Array.from(document.querySelectorAll('#primaryArea img')).map(img => ({
       src: img.src,
       alt: img.alt || 'No alt text'
     }));
@@ -584,15 +583,19 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
     metaDetails.push(...metaTags);
 }
 
-// Aka Check
-// Aka Check
+
+//Short URL Check
 if (checkAka || checkAllDetails) {
-  const links = Array.from(document.querySelectorAll('a')).map(link => ({
+  const filteredLinks = Array.from(document.querySelectorAll('a'))
+    .filter(link => link.href.includes('aka.ms') || !link.href.includes('microsoft.com') && !link.href.includes('www.'))
+    .map(link => ({
       url: link.href,
-      status: link.href.includes('aka.ms') ? 'aka.ms' : 'Normal URL'
-  }));
-  akaLinks.push(...links);
+      status: link.href.includes('aka.ms') || !link.href.includes('microsoft.com') && !link.href.includes('www.') ? 'Included' : 'Excluded'
+    }));
+
+  akaLinks.push(...filteredLinks);
 }
+
 
   return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails, metaDetails, akaLinks};
   }
