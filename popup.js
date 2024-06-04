@@ -84,6 +84,59 @@ document.getElementById('previewButton').addEventListener('click', () => {
 });
 
 document.getElementById('downloadExcelButton').addEventListener('click', () => {
+  // Retrieve data directly from the DOM
+  const allLinksData = [["URL", "Status"]].concat(
+    Array.from(document.querySelectorAll('#allLinksTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+
+  const brokenLinksData = [["URL", "Status"]].concat(
+    Array.from(document.querySelectorAll('#brokenLinksTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+
+  const localLanguageLinksData = [["URL", "Text"]].concat(
+    Array.from(document.querySelectorAll('#localLanguageLinksTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+
+  // Repeat the same process for other tables
+
+  // Convert Headings to worksheet
+  const headingsData = [["Tag", "Text"]].concat(
+    Array.from(document.querySelectorAll('#headingTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+
+  const ariaData = [["Element", "ARIA Label", "Link"]].concat(
+    Array.from(document.querySelectorAll('#ariaTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+
+  const imageData = [["Source", "Alt Text"]].concat(
+    Array.from(document.querySelectorAll('#imageTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+
+  const metaData = [["Tag Name", "Content Value"]].concat(
+    Array.from(document.querySelectorAll('#metaTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+
+  const akaData = [["URL"]].concat(
+    Array.from(document.querySelectorAll('#akaTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+
+  // Workbook creation
   const wb = XLSX.utils.book_new();
   wb.Props = {
     Title: "Link Report",
@@ -91,89 +144,31 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
     Author: "Your Name",
     CreatedDate: new Date()
   };
- /////////////////////////////////WORK-SHEET OF GENERATE XLSX DOWNLOAD////////////////////////////////////////////////////////-S
-  // Convert all links to worksheet
-  const allLinksData = [["", ""]].concat(
-    Array.from(document.querySelectorAll('#allLinksTable tr')).map(row => {
-      return Array.from(row.cells).map(cell => cell.textContent);
-    })
-  );
+
+  // Convert each table data to sheets
   const allLinksSheet = XLSX.utils.aoa_to_sheet(allLinksData);
-  XLSX.utils.book_append_sheet(wb, allLinksSheet, "All Links");
-
-  // Convert broken links to worksheet
-  const brokenLinksData = [["", ""]].concat(
-    Array.from(document.querySelectorAll('#brokenLinksTable tr')).map(row => {
-      return Array.from(row.cells).map(cell => cell.textContent);
-    })
-  );
   const brokenLinksSheet = XLSX.utils.aoa_to_sheet(brokenLinksData);
-  XLSX.utils.book_append_sheet(wb, brokenLinksSheet, "Broken Links");
-
-  // Convert local language links to worksheet
-  const localLanguageLinksData = [["", ""]].concat(
-    Array.from(document.querySelectorAll('#localLanguageLinksTable tr')).map(row => {
-      return Array.from(row.cells).map(cell => cell.textContent);
-    })
-  );
   const localLanguageLinksSheet = XLSX.utils.aoa_to_sheet(localLanguageLinksData);
-  XLSX.utils.book_append_sheet(wb, localLanguageLinksSheet, "Local Language Links");
-
-    // Convert Headings to worksheet
-  const headingsData = [["", ""]].concat(
-    Array.from(document.querySelectorAll('#headingTable tr')).map(row => {
-      return Array.from(row.cells).map(cell => cell.textContent);
-    })
-  );
-  const HeadingsSheet = XLSX.utils.aoa_to_sheet(headingsData);
-  XLSX.utils.book_append_sheet(wb, HeadingsSheet, "Headings");
-
- 
-
-  // Convert AriaLabel to worksheet
-  const ariaData = [["", ""]].concat(
-    Array.from(document.querySelectorAll('#ariaTable tr')).map(row => {
-      return Array.from(row.cells).map(cell => cell.textContent);
-    })
-  );
+  const headingsSheet = XLSX.utils.aoa_to_sheet(headingsData);
   const ariaSheet = XLSX.utils.aoa_to_sheet(ariaData);
-  XLSX.utils.book_append_sheet(wb, ariaSheet, "Aria Label Details");
-
-
-
-   // Convert Images to worksheet
-   const imageData = [["", ""]].concat(
-    Array.from(document.querySelectorAll('#imageTable tr')).map(row => {
-      return Array.from(row.cells).map(cell => cell.textContent);
-    })
-  );
   const imageSheet = XLSX.utils.aoa_to_sheet(imageData);
-  XLSX.utils.book_append_sheet(wb, imageSheet, "Image Details");
-
-
-
-   // Convert Meta to worksheet
-   const metaData = [["", ""]].concat(
-    Array.from(document.querySelectorAll('#metaTable tr')).map(row => {
-      return Array.from(row.cells).map(cell => cell.textContent);
-    })
-  );
   const metaSheet = XLSX.utils.aoa_to_sheet(metaData);
-  XLSX.utils.book_append_sheet(wb, metaSheet, "Page Property Details");
-
-  
-
-   // Convert aka.ms to worksheet
-   const akaData = [["", ""]].concat(
-    Array.from(document.querySelectorAll('#akaTable tr')).map(row => {
-      return Array.from(row.cells).map(cell => cell.textContent);
-    })
-  );
   const akaSheet = XLSX.utils.aoa_to_sheet(akaData);
+
+  // Append each sheet to the workbook
+  XLSX.utils.book_append_sheet(wb, allLinksSheet, "All Links");
+  XLSX.utils.book_append_sheet(wb, brokenLinksSheet, "Broken Links");
+  XLSX.utils.book_append_sheet(wb, localLanguageLinksSheet, "Local Language Links");
+  XLSX.utils.book_append_sheet(wb, headingsSheet, "Headings");
+  XLSX.utils.book_append_sheet(wb, ariaSheet, "ARIA Label Details");
+  XLSX.utils.book_append_sheet(wb, imageSheet, "Image Details");
+  XLSX.utils.book_append_sheet(wb, metaSheet, "Page Property Details");
   XLSX.utils.book_append_sheet(wb, akaSheet, "Short URL Details");
 
+  // Trigger the download
   XLSX.writeFile(wb, 'links_report.xlsx');
 });
+
  /////////////////////////////////WORK-SHEET OF GENERATE XLSX DOWNLOAD////////////////////////////////////////////////////////-E
 
 
@@ -519,17 +514,17 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   const metaDetails = [];
   const akaLinks = [];
 
-  const toggleSelector = document.getElementById('toggleSelector');
-  const primaryAreaSelector = toggleSelector && toggleSelector.checked ? '#primaryArea ' : '';
+  // const toggleSelector = document.getElementById('toggleSelector');
+  // const primaryAreaSelector = toggleSelector && toggleSelector.checked ? '#primaryArea ' : '';
  
 
-  const linksSelector = `${primaryAreaSelector}a`;
-  const headingSelector = `${primaryAreaSelector}h1, ${primaryAreaSelector}h2, ${primaryAreaSelector}h3, ${primaryAreaSelector}h4, ${primaryAreaSelector}h5, ${primaryAreaSelector}h6`;
-  const ariaSelector = `${primaryAreaSelector}[aria-label]`;
-  const imageSelector = `${primaryAreaSelector}img`;
-  const metaSelector = `${primaryAreaSelector}meta`;
+  // const linksSelector = `${primaryAreaSelector}a`;
+  // const headingSelector = `${primaryAreaSelector}h1, ${primaryAreaSelector}h2, ${primaryAreaSelector}h3, ${primaryAreaSelector}h4, ${primaryAreaSelector}h5, ${primaryAreaSelector}h6`;
+  // const ariaSelector = `${primaryAreaSelector}[aria-label]`;
+  // const imageSelector = `${primaryAreaSelector}img`;
+  // const metaSelector = `${primaryAreaSelector}meta`;
 
-  const links = Array.from(document.querySelectorAll(linksSelector)).map(link => ({
+  const links = Array.from(document.querySelectorAll('a')).map(link => ({
     url: link.href,
     text: link.textContent 
   }));
@@ -555,7 +550,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   }
 
   if (checkHeading || checkAllDetails) {
-    const headings = Array.from(document.querySelectorAll(headingSelector)).map(heading => ({
+    const headings = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6')).map(heading => ({
       tag: heading.tagName.toLowerCase(),
       text: heading.textContent.trim()
     }));
@@ -563,7 +558,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   }
 
   if (ariaCheck || checkAllDetails) {
-    const ariaElements = Array.from(document.querySelectorAll(ariaSelector)).map(element => ({
+    const ariaElements = Array.from(document.querySelectorAll('[aria-label]')).map(element => ({
       element: element.tagName.toLowerCase(),
       ariaLabel: element.getAttribute('aria-label'),
       target: element.getAttribute('href') ||'',
@@ -573,7 +568,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   }
 
   if (imageCheck || checkAllDetails) {
-    const images = Array.from(document.querySelectorAll(imageSelector)).map(img => ({
+    const images = Array.from(document.querySelectorAll('img')).map(img => ({
       src: img.src,
       alt: img.alt || 'No alt text'
     }));
@@ -582,7 +577,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
 
 
   if (checkMeta || checkAllDetails) {
-    const metaTags = Array.from(document.querySelectorAll(metaSelector)).map(metaTag => ({
+    const metaTags = Array.from(document.querySelectorAll('meta')).map(metaTag => ({
         tagName: metaTag.getAttribute('name') || metaTag.getAttribute('property') || metaTag.getAttribute('http-equiv'),
         content: metaTag.getAttribute('content')
     })).filter(meta => meta.tagName && meta.content); // Filter to only include meta tags with both tagName and content
