@@ -227,7 +227,7 @@ async function comparePages() {
 
 
 document.getElementById('compare-button').addEventListener('click', comparePages);
-document.getElementById('downloadExcelButton').addEventListener('click', downloadExcel);
+document.getElementById('downloadComparisonButton').addEventListener('click', downloadExcel);
 ////////////////////////////////////////////////////////////////////////////////////////
 // async function comparePages() {
 //   const targetUrl = document.getElementById('compare-url').value;
@@ -602,20 +602,6 @@ if (checkAka || checkAllDetails) {
   return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails, metaDetails, akaLinks};
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /////////////////////////////////////////////////////////////////////////////
   document.addEventListener('DOMContentLoaded', function() {
     const nightModeButton = document.getElementById('nightModeButton');
@@ -650,3 +636,4 @@ if (checkAka || checkAllDetails) {
     checkAllDetails.addEventListener("change", toggleCheckboxes);
   });
   ////////////////////////////////////////////////////////////////////////////////////
+

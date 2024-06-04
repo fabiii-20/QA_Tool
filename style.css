@@ -221,6 +221,22 @@ h2 {
     
   }
 
+  #downloadComparisonButton{
+    background-color:#1a73e8;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 20px; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
+  }
+
+  #downloadComparisonButton:hover{
+    background-color: #0f5ec4;
+  }
+
   #downloadExcelButton:hover{
     background-color: #0f5ec4;
   }
@@ -462,7 +478,7 @@ input:checked + .slider:before {
 .night-mode #doneButton,
 .night-mode #previewButton,
 .night-mode #clear,
-.night-mode #downloadPdfButton,
+.night-mode #downloadComparisonButton,
 .night-mode #downloadExcelButton {
   background-color: #404040; /* Adjust background color */
   color:rgb(234, 234, 234); /* Adjust text color */
@@ -470,7 +486,7 @@ input:checked + .slider:before {
 }
 
 /* Update icons in the download buttons */
-.night-mode #downloadPdfButton i.fa-file-pdf,
+.night-mode #downloadComparisonButton i.fa-code-compare,
 .night-mode #downloadExcelButton i.fa-file-excel {
   color: #ff6347; /* Adjust icon color */
 }
@@ -495,3 +511,9 @@ input:checked + .slider:before {
   color: black; /* Set moon icon color to black */
   
 }
+
+#downloadComparisonButton{
+  margin-left: 480px;
+
+}
+
