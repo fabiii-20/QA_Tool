@@ -587,10 +587,10 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
 //Short URL Check
 if (checkAka || checkAllDetails) {
   const filteredLinks = Array.from(document.querySelectorAll('a'))
-    .filter(link => link.href.includes('aka.ms') || !link.href.includes('microsoft.com') && !link.href.includes('www.'))
+    .filter(link => link.href.includes('aka.ms') || !link.href.includes('microsoft.com') && !link.href.includes('www.')&& !link.href.includes('com'))
     .map(link => ({
       url: link.href,
-      status: link.href.includes('aka.ms') || !link.href.includes('microsoft.com') && !link.href.includes('www.') ? 'Included' : 'Excluded'
+      status: link.href.includes('aka.ms') || !link.href.includes('microsoft.com') && !link.href.includes('www.') && !link.href.includes('com') ? 'Included' : 'Excluded'
     }));
 
   akaLinks.push(...filteredLinks);
