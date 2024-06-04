@@ -482,9 +482,8 @@ function displayMeta(metaDetails) {
 
 
 function displayAkaLinks(akaLinks) {
-  const akaLinksFiltered = akaLinks.filter(link => link.url.includes('aka.ms')); // Filter to include only aka.ms links
   let html = '<table><tr><th>URL</th></tr>';
-  akaLinksFiltered.forEach(link => {
+  akaLinks.forEach(link => {
     html += `<tr><td>${link.url}</td></tr>`; // Display only the URL
   });
   html += '</table>';
@@ -597,14 +596,16 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
     metaDetails.push(...metaTags);
 }
 
-// Aka Check
-// Aka Check
+//Short URL Check
 if (checkAka || checkAllDetails) {
-  const links = Array.from(document.querySelectorAll('a')).map(link => ({
+  const filteredLinks = Array.from(document.querySelectorAll('a'))
+    .filter(link => link.href.includes('aka.ms') || !link.href.includes('microsoft.com') && !link.href.includes('www.')&& !link.href.includes('com'))
+    .map(link => ({
       url: link.href,
-      status: link.href.includes('aka.ms') ? 'aka.ms' : 'Normal URL'
-  }));
-  akaLinks.push(...links);
+      status: link.href.includes('aka.ms') || !link.href.includes('microsoft.com') && !link.href.includes('www.') && !link.href.includes('com') ? 'Included' : 'Excluded'
+    }));
+
+  akaLinks.push(...filteredLinks);
 }
 
   return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails, metaDetails, akaLinks};
@@ -644,4 +645,3 @@ if (checkAka || checkAllDetails) {
     checkAllDetails.addEventListener("change", toggleCheckboxes);
   });
   ////////////////////////////////////////////////////////////////////////////////////
-
