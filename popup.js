@@ -270,7 +270,8 @@ function extractPageContent(doc) {
     textFields: [],
     ariaLinks: [],
     images: [],
-    metaTags:[]
+    metaTags:[],
+    header: []
   };
 
   doc.querySelectorAll('h1, h2, p, a').forEach(el => {
@@ -301,6 +302,20 @@ function extractPageContent(doc) {
     }
 });
 
+// doc.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(header => {
+//   content.header.push({
+//     tag: header.tagName.toLowerCase(),
+//     text: header.innerText
+//   });
+// });
+
+doc.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(header => {
+  content.header.push({
+    tag: header.tagName.toLowerCase(),
+    text: header.innerText.replace(/\n/g, '').trim()
+  });
+});
+
   return content;
 }
 
@@ -309,6 +324,7 @@ function displayDifferences(current, target) {
   displayTable('aria-comparison', current.ariaLinks, target.ariaLinks);
   displayTable('images-comparison', current.images, target.images);
   displayTable('meta-comparison', current.metaTags, target.metaTags);
+  displayTable('head-comparison', current.header, target.header);
 }
 
 function displayTable(tableId, currentData, targetData) {
