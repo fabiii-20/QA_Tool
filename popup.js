@@ -8,8 +8,9 @@ document.getElementById('doneButton').addEventListener('click', async () => {
   const imageCheck = document.getElementById('imageCheck').checked;
   const checkMeta = document.getElementById('metaCheck').checked;
   const checkAka = document.getElementById('akaCheck').checked;
+  const checkRedirect = document.getElementById('redirectCheck').checked;
 
-  if (!checkAllLinks && !checkBrokenLinks && !checkLocalLanguageLinks && !checkAllDetails && !checkHeading && !ariaCheck && !imageCheck && !checkMeta && !checkAka) {
+  if (!checkAllLinks && !checkBrokenLinks && !checkLocalLanguageLinks && !checkAllDetails && !checkHeading && !ariaCheck && !imageCheck && !checkMeta && !checkAka && !checkRedirect) {
     alert('Please check at least one checkbox.');
     return;
   }
@@ -39,7 +40,7 @@ document.getElementById('doneButton').addEventListener('click', async () => {
     const [{ result }] = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: checkLinks,
-      args: [checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading, ariaCheck, imageCheck,checkMeta, checkAka]
+      args: [checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading, ariaCheck, imageCheck,checkMeta, checkAka, checkRedirect]
     });
 
     console.log('Link check result:', result); // Debugging
@@ -78,6 +79,7 @@ document.getElementById('previewButton').addEventListener('click', () => {
     displayImages(results.imageDetails);
     displayMeta(results.metaDetails);
     displayAkaLinks(results.akaLinks);
+    displayRedirectLinks(results.redirectLinks);
   } else {
     alert('No data to preview. Please click "Generate" first.');
   }
@@ -490,6 +492,17 @@ function displayAkaLinks(akaLinks) {
   document.getElementById('akaTable').innerHTML = html;
 }
 
+function displayRedirectLinks(links) {
+  let html = '<table><tr><th>Redirect Links</th><th>Status</th></tr>';
+  links.forEach(link => {
+    const statusColor = link.status === 200 ? 'green' : 'red';
+    html += `<tr><td>${highlightPercent20(link.url)}</td><td style="color: ${statusColor};">${link.status}</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('redirectTable').innerHTML = html;
+
+}
+
 
 
 
@@ -511,7 +524,7 @@ function highlightPercent20(url) {
   return url.replace(/%20/g, '<span style="color: red;">%20</span>');
 }
 
-async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading, ariaCheck, imageCheck, checkMeta, checkAka) {
+async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLinks, checkAllDetails, checkHeading, ariaCheck, imageCheck, checkMeta, checkAka, checkRedirect) {
   const allLinks = [];
   const brokenLinks = [];
   const localLanguageLinks = [];
@@ -525,6 +538,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
   const imageDetails = [];
   const metaDetails = [];
   const akaLinks = [];
+  const redirectLinks = [];
 
   // const toggleSelector = document.getElementById('toggleSelector');
   // const primaryAreaSelector = toggleSelector && toggleSelector.checked ? '#primaryArea ' : '';
@@ -550,6 +564,10 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
 
       if ((checkBrokenLinks || checkAllDetails) && (status === 400 || status === 404 || status === 410 || status === 502 || status === 408 || status === 503 || link.url.includes('%20'))) {
         brokenLinks.push({ url: link.url, status });
+      }
+
+      if((checkRedirect || checkAllDetails) && (status ===301)){
+        redirectLinks.push({url: link.url, status });
       }
 
       if ((checkLocalLanguageLinks || checkAllDetails) && localLanguageList.some(language => link.url.includes(language))) {
@@ -608,7 +626,7 @@ if (checkAka || checkAllDetails) {
   akaLinks.push(...filteredLinks);
 }
 
-  return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails, metaDetails, akaLinks};
+  return { allLinks, brokenLinks, localLanguageLinks, headingHierarchy, ariaDetails, imageDetails, metaDetails, akaLinks, redirectLinks};
   }
 
 /////////////////////////////////////////////////////////////////////////////

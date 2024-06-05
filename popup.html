@@ -137,6 +137,20 @@
             
           </div>
 
+          <div class="checkbox-container">
+            <i class="fas fa-link"></i>
+            <input type="checkbox" id="redirectCheck" />
+            
+            <label for="enable-check-4">Redirecitng Link Check</label> 
+            <div class="info-container">
+              <span class="question-icon">?</span>
+              <span class="tooltip-text"></span>
+            </div>  
+
+            
+          </div>
+
+
           
         
         </div>
@@ -189,14 +203,14 @@
   <div id="comparisonResults" style="display:none;">
     <h2>Text Fields Comparison</h2><button type="button" id="downloadComparisonButton"><i class="fa-solid fa-code-compare"></i> Download Comparison </button>
     <thead>
-<table id="text-comparison"> 
+  <table id="text-comparison">
         <tr>
             <th>Current Page</th>
             <th>Target Page</th>
         </tr>
     </thead>
     <tbody></tbody>
-</table>
+  </table>
 
 <h2>ARIA-label Links Comparison</h2>
 <table id="aria-comparison">
@@ -266,6 +280,9 @@
       <div id="akaTable">
       </div>
 
+      <h4>Redirect URLs</h4>
+      <div id="redirectTable">
+      </div>
 
     </div>
   <script src="popup.js"></script>
