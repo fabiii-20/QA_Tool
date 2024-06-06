@@ -141,6 +141,14 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
     })
   );
 
+  const redirectLinksData = [["URL", "Status"]].concat(
+    Array.from(document.querySelectorAll('redirectTable tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+    })
+  );
+
+  
+
   // Workbook creation
   const wb = XLSX.utils.book_new();
   wb.Props = {
@@ -159,6 +167,7 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
   const imageSheet = XLSX.utils.aoa_to_sheet(imageData);
   const metaSheet = XLSX.utils.aoa_to_sheet(metaData);
   const akaSheet = XLSX.utils.aoa_to_sheet(akaData);
+  const redirectSheet =  XLSX.utils.aoa_to_sheet(redirectLinksData);
 
   // Append each sheet to the workbook
   XLSX.utils.book_append_sheet(wb, allLinksSheet, "All Links");
@@ -169,6 +178,8 @@ document.getElementById('downloadExcelButton').addEventListener('click', () => {
   XLSX.utils.book_append_sheet(wb, imageSheet, "Image Details");
   XLSX.utils.book_append_sheet(wb, metaSheet, "Page Property Details");
   XLSX.utils.book_append_sheet(wb, akaSheet, "Short URL Details");
+  XLSX.utils.book_append_sheet(wb, redirectSheet, "Redirect URL Details");
+
 
   // Trigger the download
   XLSX.writeFile(wb, 'links_report.xlsx');
@@ -401,6 +412,18 @@ function downloadExcel() {
 const metaComparisonSheet = XLSX.utils.aoa_to_sheet(metaComparisonData);
 XLSX.utils.book_append_sheet(wb, metaComparisonSheet, "Meta Tags Comparison");
 
+
+
+
+
+const headerComparisonData = [["Current Page", "Target Page"]].concat(
+  Array.from(document.querySelectorAll('#head-comparison tbody tr')).map(row => {
+      return Array.from(row.cells).map(cell => cell.textContent);
+  })
+);
+const headerComparisonSheet = XLSX.utils.aoa_to_sheet(headerComparisonData);
+XLSX.utils.book_append_sheet(wb, headerComparisonSheet, "Head Tags Comparison");
+
   XLSX.writeFile(wb, 'comparison_report.xlsx');
 }
  /////////////////////////////////WORK-SHEET XLSX DOWNLOAD////////////////////////////////////////////////////////////-E
@@ -508,9 +531,9 @@ function displayAkaLinks(akaLinks) {
   document.getElementById('akaTable').innerHTML = html;
 }
 
-function displayRedirectLinks(links) {
+function displayRedirectLinks(redirectLinks) {
   let html = '<table><tr><th>Redirect Links</th><th>Status</th></tr>';
-  links.forEach(link => {
+  redirectLinks.forEach(link => {
     const statusColor = link.status === 200 ? 'green' : 'red';
     html += `<tr><td>${highlightPercent20(link.url)}</td><td style="color: ${statusColor};">${link.status}</td></tr>`;
   });
