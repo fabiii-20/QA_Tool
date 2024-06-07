@@ -68,7 +68,7 @@ h2 {
 
   /* Styles for done button */
   
-  #doneButton,#previewButton{
+  #doneButton,#previewButton,#terminateButton{
     background-color: #1a73e8;;
     color: white;
     border: none;
@@ -87,9 +87,10 @@ h2 {
     cursor: pointer;
     border-radius: 20px; 
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    
 
   }
+
+  
 
   #clear{
     background-color:#1a73e8;;
@@ -102,7 +103,7 @@ h2 {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 
   }
-  #compare-button:hover {
+  #compare-button,#terminateButton:hover {
     background-color: #0f5ec4; 
   }
 
@@ -309,6 +310,9 @@ Move the Generate button and Preview button to the left side */
 #previewButton{
   margin-right: 180px;
 } 
+#terminateButton{
+  margin-right: 10px;
+}
 
 #compare-button{
   margin-left: 2px;
