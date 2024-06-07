@@ -1,4 +1,35 @@
+// Define global variables
+let executionAllowed = true; // Global variable to track execution status
+let countdownInterval; // Variable to hold the countdown interval
+
+// Add event listener for the "Terminate" button
+document.getElementById('terminateButton').addEventListener('click', () => {
+    // Set executionAllowed to false to terminate execution
+    executionAllowed = false;
+
+    // Clear the countdown interval
+    clearInterval(countdownInterval);
+
+        // Reset checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+          checkbox.checked = false;
+      });
+
+    // Optionally, hide the countdown element
+    const countdownElement = document.getElementById('countdown');
+    if (countdownElement) {
+        countdownElement.style.display = 'none';
+    }
+});
+
+///////////////////////////////////////////////////////////////////////////////////////above code is for terminate
+
+
 document.getElementById('doneButton').addEventListener('click', async () => {
+  if (!executionAllowed) {
+    alert('Execution terminated.');
+    return;
+}
   const checkAllLinks = document.getElementById('checkAllLinks').checked;
   const checkBrokenLinks = document.getElementById('checkBrokenLinks').checked;
   const checkLocalLanguageLinks = document.getElementById('checkLocalLanguageLinks').checked;
@@ -286,7 +317,8 @@ function extractPageContent(doc) {
   };
 
   doc.querySelectorAll('h1, h2, p, a').forEach(el => {
-    content.textFields.push(el.innerText);
+    // Replace \n and \t with empty string, then trim and push inner text
+    content.textFields.push(el.innerText.replace(/\n/g, '').replace(/\t/g, '').trim());
   });
 
   doc.querySelectorAll('[aria-label]').forEach(el => {
@@ -357,7 +389,7 @@ function displayTable(tableId, currentData, targetData) {
     if (currentContent !== targetContent) {
       // Highlight the cells where the content is different
       currentCell.style.backgroundColor = 'lightcoral';
-      targetCell.style.backgroundColor = 'lightcoral';
+      targetCell.style.backgroundColor = 'lightgreen';
     }
 
     row.appendChild(currentCell);
@@ -605,7 +637,7 @@ async function checkLinks(checkAllLinks, checkBrokenLinks, checkLocalLanguageLin
         brokenLinks.push({ url: link.url, status });
       }
 
-      if((checkRedirect || checkAllDetails) && (status ===301)){
+      if((checkRedirect || checkAllDetails) && (status ===301 || status=== 302)){
         redirectLinks.push({url: link.url, status });
       }
 
